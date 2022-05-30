@@ -17,45 +17,92 @@ class PresentationView extends StatelessWidget {
         title: Text(pitch.name),
       ),
       body: StreamBuilder(
-          stream: Stream.periodic(
-              const Duration(milliseconds: 200), (int _) => DateTime.now().difference(start)),
+          stream: Stream.periodic(const Duration(milliseconds: 200),
+              (int _) => DateTime.now().difference(start)),
           initialData: Duration.zero,
           builder: (context, AsyncSnapshot<Duration> snapshot) {
-            final chapter =
-                pitch.chapters[getChapterIndexForTime(snapshot.data!, pitch.chapters) ?? 0];
+            int? chapterIndex =
+                getChapterIndexForTime(snapshot.data!, pitch.chapters);
+
+            final previousChapter = (chapterIndex ?? 0) > 0
+                ? pitch.chapters[chapterIndex! - 1]
+                : null;
+            final currentChapter = pitch.chapters[chapterIndex ?? 0];
+            final nextChapter = (chapterIndex ?? pitch.chapters.length) <
+                    (pitch.chapters.length - 1)
+                ? pitch.chapters[chapterIndex! + 1]
+                : null;
+            Duration pastChaptersTime =
+                getPastChaptersTime(pitch.chapters, chapterIndex);
             return Center(
                 child: Column(
               children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    LinearProgressIndicator(
-                      minHeight: 20,
-                      color: Theme.of(context).colorScheme.secondary,
-                      value: snapshot.data!.inMilliseconds / pitch.totalDuration.inMilliseconds,
-                    ),
-                    Text(
-                      "${snapshot.data!.inSeconds} sec.",
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(color: Colors.red),
-                    ),
-                  ],
-                ),
                 ListView(
                   physics: const ClampingScrollPhysics(),
                   padding: const EdgeInsets.all(20),
                   shrinkWrap: true,
                   children: [
                     const SizedBox(height: 20),
-                    Text(chapter.name, style: Theme.of(context).textTheme.headlineLarge),
-                    const SizedBox(height: 20),
-                    Text(chapter.notes, style: Theme.of(context).textTheme.labelLarge),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    Text("Chapter duration: ${chapter.duration.inSeconds.toString()} seconds",
+                    Text("previous",
                         style: Theme.of(context).textTheme.labelLarge),
+                    Text(previousChapter?.name ?? '',
+                        style: Theme.of(context).textTheme.headlineLarge),
+                    const SizedBox(height: 20),
                   ],
-                )
+                ),
+                const Divider(),
+                Container(
+                  ///color: Theme.of(context).colorScheme.secondary,
+                  child: ListView(
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    shrinkWrap: true,
+                    children: [
+                      const SizedBox(height: 20),
+                      Text(currentChapter.name,
+                          style: Theme.of(context).textTheme.headline1),
+                      const SizedBox(height: 20),
+                      Text(currentChapter.notes,
+                          style: Theme.of(context).textTheme.bodyLarge),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    LinearProgressIndicator(
+                      minHeight: 40,
+                      color: Theme.of(context).colorScheme.secondary,
+                      value:
+                          (snapshot.data! - pastChaptersTime).inMilliseconds /
+                              currentChapter.duration.inMilliseconds,
+                    ),
+                    Text(
+                      "${(pastChaptersTime + currentChapter.duration - snapshot.data!).inSeconds} sec.",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge!
+                          .copyWith(color: Colors.red),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                ListView(
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
+                  shrinkWrap: true,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text("next", style: Theme.of(context).textTheme.labelLarge),
+                    Text(nextChapter?.name ?? '',
+                        style: Theme.of(context).textTheme.headlineLarge),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ],
             ));
           }),
@@ -71,5 +118,14 @@ class PresentationView extends StatelessWidget {
       elapsed -= currentChapter.duration;
     }
     return null;
+  }
+
+  Duration getPastChaptersTime(
+      List<PitchChapter> chapters, int? currentChapterIndex) {
+    Duration timeDelta = Duration.zero;
+    for (int index = 0; index != (currentChapterIndex ?? 0); ++index) {
+      timeDelta += chapters[index].duration;
+    }
+    return timeDelta;
   }
 }

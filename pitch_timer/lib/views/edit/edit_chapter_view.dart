@@ -8,7 +8,8 @@ class EditChapterView extends StatelessWidget {
   final void Function(PitchChapter) onValueChanged;
   final _formKey = GlobalKey<FormBuilderState>();
 
-  EditChapterView({required this.chapter, required this.onValueChanged, Key? key})
+  EditChapterView(
+      {required this.chapter, required this.onValueChanged, Key? key})
       : super(key: key);
 
   @override
@@ -55,7 +56,7 @@ class EditChapterView extends StatelessWidget {
               FormBuilderSlider(
                 name: 'duration',
                 initialValue: chapter.durationSeconds.toDouble(),
-                max: 5000,
+                max: 300,
                 min: 1,
                 decoration: const InputDecoration(
                   labelText: 'Duration sec.',
@@ -70,7 +71,8 @@ class EditChapterView extends StatelessWidget {
                         name: _formKey.currentState?.value['name'] as String,
                         notes: _formKey.currentState?.value['notes'] as String,
                         durationSeconds:
-                            (_formKey.currentState?.value['duration'] as double).toInt(),
+                            (_formKey.currentState?.value['duration'] as double)
+                                .toInt(),
                       ));
                       Navigator.of(context).pop();
                     }
