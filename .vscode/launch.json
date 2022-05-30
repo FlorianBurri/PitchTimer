@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "pitch_timer",
+            "cwd": "pitch_timer",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "pitch_timer (profile mode)",
+            "cwd": "pitch_timer",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "pitch_timer (release mode)",
+            "cwd": "pitch_timer",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
