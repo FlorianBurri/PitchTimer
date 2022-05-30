@@ -1,0 +1,5 @@
+# Run flutter pub run icons_launcher:create to update
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
