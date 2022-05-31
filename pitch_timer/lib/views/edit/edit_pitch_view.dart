@@ -1,31 +1,27 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
 import 'package:pitch_timer/views/edit/edit_chapter_view.dart';
 import 'package:pitch_timer/views/presentation/presentation_view.dart';
-import 'package:provider/provider.dart';
+import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 import 'package:sliding_number/sliding_number.dart';
 
-class EditPitchView extends StatefulWidget {
+class EditPitchView extends ConsumerWidget {
   final PitchData pitch;
 
   const EditPitchView({required this.pitch, Key? key}) : super(key: key);
 
   @override
-  State<EditPitchView> createState() => _EditPitchViewState();
-}
-
-class _EditPitchViewState extends State<EditPitchView> {
-  @override
-  Widget build(BuildContext context) {
-    final pitchDataProvider = context.watch<PitchDataProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pitchData = ref.watch(pitchDataProvider);
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.pitch.name),
+          title: Text(pitch.name),
         ),
         body: Column(
           children: [
@@ -42,8 +38,8 @@ class _EditPitchViewState extends State<EditPitchView> {
                           children: [
                             SlidableAction(
                               onPressed: (context) {
-                                widget.pitch.chapters.removeAt(index);
-                                pitchDataProvider.updatePitch(widget.pitch);
+                                pitch.chapters.removeAt(index);
+                                pitchData.updatePitch(pitch);
                               },
                               icon: Icons.delete,
                               label: 'Delete',
@@ -51,43 +47,43 @@ class _EditPitchViewState extends State<EditPitchView> {
                           ],
                         ),
                         child: ListTile(
-                          title: Text(widget.pitch.chapters[index].name),
+                          title: Text(pitch.chapters[index].name),
                           subtitle: Text(
-                            "${widget.pitch.chapters[index].duration.inSeconds} seconds",
+                            "${pitch.chapters[index].duration.inSeconds} seconds",
                           ),
                           trailing: ReorderableDragStartListener(
                               index: index, child: const Icon(Icons.drag_handle)),
                           onTap: () => showDialog(
                               context: context,
                               builder: (_) => EditChapterView(
-                                    chapter: widget.pitch.chapters[index],
+                                    chapter: pitch.chapters[index],
                                     onValueChanged: (chapter) {
-                                      widget.pitch.chapters[index] = chapter;
-                                      pitchDataProvider.updatePitch(widget.pitch);
+                                      pitch.chapters[index] = chapter;
+                                      pitchData.updatePitch(pitch);
                                     },
                                   )),
                         ),
                       ),
                     );
                   },
-                  itemCount: widget.pitch.chapters.length,
+                  itemCount: pitch.chapters.length,
                   onReorder: (oldIndex, newIndex) {
                     if (oldIndex < newIndex) {
                       newIndex -= 1;
                     }
-                    final chapter = widget.pitch.chapters.removeAt(oldIndex);
-                    widget.pitch.chapters.insert(newIndex, chapter);
-                    pitchDataProvider.updatePitch(widget.pitch);
+                    final chapter = pitch.chapters.removeAt(oldIndex);
+                    pitch.chapters.insert(newIndex, chapter);
+                    pitchData.updatePitch(pitch);
                   }),
             ),
             IconButton(
                 onPressed: () {
-                  widget.pitch.chapters.add(
+                  pitch.chapters.add(
                     PitchChapter(
                         name: "Chapter ${Random().nextInt(100)}",
                         durationSeconds: const Duration(seconds: 142).inSeconds),
                   );
-                  pitchDataProvider.updatePitch(widget.pitch);
+                  pitchData.updatePitch(pitch);
                 },
                 icon: const Icon(
                   Icons.add_circle,
@@ -105,7 +101,7 @@ class _EditPitchViewState extends State<EditPitchView> {
                   height: 30,
                   padding: const EdgeInsets.only(right: 5),
                   child: SlidingNumber(
-                    number: widget.pitch.totalDuration.inMinutes,
+                    number: pitch.totalDuration.inMinutes,
                     style: Theme.of(context).textTheme.headlineSmall!,
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOutQuint,
@@ -125,7 +121,7 @@ class _EditPitchViewState extends State<EditPitchView> {
             ),
             GestureDetector(
               onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: widget.pitch))),
+                  .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch))),
               child: Container(
                 height: 70,
                 width: double.infinity,
