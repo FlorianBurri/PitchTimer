@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
-import 'package:pitch_timer/services/pitch_data_provider.dart';
 import 'package:pitch_timer/views/edit/edit_chapter_view.dart';
 import 'package:pitch_timer/views/presentation/presentation_view.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
@@ -52,7 +51,8 @@ class EditPitchView extends ConsumerWidget {
                             "${pitch.chapters[index].duration.inSeconds} seconds",
                           ),
                           trailing: ReorderableDragStartListener(
-                              index: index, child: const Icon(Icons.drag_handle)),
+                              index: index,
+                              child: const Icon(Icons.drag_handle)),
                           onTap: () => showDialog(
                               context: context,
                               builder: (_) => EditChapterView(
@@ -78,12 +78,19 @@ class EditPitchView extends ConsumerWidget {
             ),
             IconButton(
                 onPressed: () {
-                  pitch.chapters.add(
-                    PitchChapter(
-                        name: "Chapter ${Random().nextInt(100)}",
-                        durationSeconds: const Duration(seconds: 142).inSeconds),
-                  );
-                  pitchData.updatePitch(pitch);
+                  var newChapter = PitchChapter(
+                      name: "",
+                      durationSeconds: const Duration(seconds: 30).inSeconds);
+                  showDialog(
+                      context: context,
+                      builder: (_) => EditChapterView(
+                            chapter: newChapter,
+                            onValueChanged: (chapter) {
+                              newChapter = chapter;
+                              pitch.chapters.add(newChapter);
+                              pitchData.updatePitch(pitch);
+                            },
+                          ));
                 },
                 icon: const Icon(
                   Icons.add_circle,
@@ -120,8 +127,8 @@ class EditPitchView extends ConsumerWidget {
               ],
             ),
             GestureDetector(
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch))),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => PresentationView(pitch: pitch))),
               child: Container(
                 height: 70,
                 width: double.infinity,
