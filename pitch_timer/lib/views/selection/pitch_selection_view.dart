@@ -39,9 +39,11 @@ class PitchSelectionView extends ConsumerWidget {
                 motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
-                    onPressed: (context) => pitchData.deletePitch(pitches[index]),
+                    onPressed: (context) =>
+                        pitchData.deletePitch(pitches[index]),
                     icon: Icons.delete,
                     label: 'Delete',
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
                 ],
               ),

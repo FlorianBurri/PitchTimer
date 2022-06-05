@@ -35,6 +35,17 @@ class PitchData {
   /// Returns the total duration of the pitch
   Duration get totalDuration => chapters.fold(
         Duration.zero,
-        (Duration duration, PitchChapter chapter) => duration + chapter.duration,
+        (Duration duration, PitchChapter chapter) =>
+            duration + chapter.duration,
       );
+
+  Duration get shortestChapterDuration {
+    var shortestDuration = const Duration(hours: 1);
+    for (var chapter in chapters) {
+      if (chapter.duration < shortestDuration) {
+        shortestDuration = chapter.duration;
+      }
+    }
+    return shortestDuration;
+  }
 }
