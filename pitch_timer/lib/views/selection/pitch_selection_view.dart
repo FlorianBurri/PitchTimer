@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
 import 'package:pitch_timer/views/edit/edit_pitch_view.dart';
 import 'package:pitch_timer/views/selection/add_pitch_view.dart';
-import 'package:provider/provider.dart';
 
-class PitchSelectionView extends StatelessWidget {
+final pitchDataProvider = ChangeNotifierProvider<PitchDataProvider>((ref) {
+  return PitchDataProvider();
+});
+
+class PitchSelectionView extends ConsumerWidget {
   const PitchSelectionView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final pitchDataProvider = context.watch<PitchDataProvider>();
-    final pitches = pitchDataProvider.pitches;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pitchData = ref.watch(pitchDataProvider);
+    final pitches = pitchData.pitches;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -35,7 +39,7 @@ class PitchSelectionView extends StatelessWidget {
                 motion: const ScrollMotion(),
                 children: [
                   SlidableAction(
-                    onPressed: (context) => pitchDataProvider.deletePitch(pitches[index]),
+                    onPressed: (context) => pitchData.deletePitch(pitches[index]),
                     icon: Icons.delete,
                     label: 'Delete',
                   ),

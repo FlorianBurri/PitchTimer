@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
-import 'package:pitch_timer/services/pitch_data_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
-class AddPitchView extends StatelessWidget {
+class AddPitchView extends ConsumerWidget {
   final _controller = TextEditingController();
 
   AddPitchView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dialog(
       child: ListView(
         physics: const ClampingScrollPhysics(),
@@ -36,9 +36,7 @@ class AddPitchView extends StatelessWidget {
                   onPressed: _controller.text.isEmpty
                       ? null
                       : () {
-                          context
-                              .read<PitchDataProvider>()
-                              .addPitch(PitchData.empty(_controller.text));
+                          ref.read(pitchDataProvider).addPitch(PitchData.empty(_controller.text));
                           Navigator.of(context).pop();
                         },
                   child: const Text("Add Pitch"),
