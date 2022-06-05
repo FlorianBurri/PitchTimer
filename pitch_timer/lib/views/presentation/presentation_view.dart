@@ -37,71 +37,72 @@ class PresentationView extends StatelessWidget {
             return Center(
                 child: Column(
               children: [
-                ListView(
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.all(20),
-                  shrinkWrap: true,
-                  children: [
-                    const SizedBox(height: 20),
-                    Text("previous",
-                        style: Theme.of(context).textTheme.labelLarge),
-                    Text(previousChapter?.name ?? '',
-                        style: Theme.of(context).textTheme.headlineLarge),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-                const Divider(),
                 Container(
-                  ///color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.primary,
                   child: ListView(
                     physics: const ClampingScrollPhysics(),
                     padding: const EdgeInsets.all(20),
                     shrinkWrap: true,
                     children: [
-                      const SizedBox(height: 20),
-                      Text(currentChapter.name,
-                          style: Theme.of(context).textTheme.headline1),
-                      const SizedBox(height: 20),
-                      Text(currentChapter.notes,
-                          style: Theme.of(context).textTheme.bodyLarge),
-                      const SizedBox(
-                        height: 40,
-                      ),
+                      Text("previous",
+                          style: Theme.of(context).textTheme.labelMedium),
+                      Text(previousChapter?.name ?? '',
+                          style: Theme.of(context).textTheme.displaySmall),
                     ],
                   ),
                 ),
-                const Spacer(),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    LinearProgressIndicator(
-                      minHeight: 40,
-                      color: Theme.of(context).colorScheme.secondary,
-                      value:
-                          (snapshot.data! - pastChaptersTime).inMilliseconds /
-                              currentChapter.duration.inMilliseconds,
-                    ),
-                    Text(
-                      "${(pastChaptersTime + currentChapter.duration - snapshot.data!).inSeconds} sec.",
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge!
-                          .copyWith(color: Colors.red),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            physics: const ClampingScrollPhysics(),
+                            padding: const EdgeInsets.all(20),
+                            shrinkWrap: true,
+                            children: [
+                              const SizedBox(height: 20),
+                              Text(currentChapter.name,
+                                  style:
+                                      Theme.of(context).textTheme.displaySmall),
+                              const SizedBox(height: 20),
+                              Text(currentChapter.notes,
+                                  style:
+                                      Theme.of(context).textTheme.titleLarge),
+                              const SizedBox(
+                                height: 40,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 30,
+                          child: RotatedBox(
+                            quarterTurns: 1,
+                            child: LinearProgressIndicator(
+                              minHeight: 20,
+                              color: Theme.of(context).colorScheme.secondary,
+                              value: (snapshot.data! - pastChaptersTime)
+                                      .inMilliseconds /
+                                  currentChapter.duration.inMilliseconds,
+                            ),
+                          ),
+                        ),
+                      ]),
                 ),
-                const Divider(),
-                ListView(
-                  physics: const ClampingScrollPhysics(),
-                  padding: const EdgeInsets.all(20),
-                  shrinkWrap: true,
-                  children: [
-                    const SizedBox(height: 20),
-                    Text("next", style: Theme.of(context).textTheme.labelLarge),
-                    Text(nextChapter?.name ?? '',
-                        style: Theme.of(context).textTheme.headlineLarge),
-                    const SizedBox(height: 20),
-                  ],
+                Container(
+                  color: Theme.of(context).colorScheme.primary,
+                  child: ListView(
+                    physics: const ClampingScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    shrinkWrap: true,
+                    children: [
+                      Text("next",
+                          style: Theme.of(context).textTheme.labelMedium),
+                      Text(nextChapter?.name ?? '',
+                          style: Theme.of(context).textTheme.displaySmall),
+                    ],
+                  ),
                 ),
               ],
             ));
