@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
@@ -9,7 +8,6 @@ import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/views/edit/edit_chapter_view.dart';
 import 'package:pitch_timer/views/presentation/presentation_view.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
-import 'package:sliding_number/sliding_number.dart';
 
 class EditPitchView extends ConsumerWidget {
   final PitchData pitch;
@@ -31,8 +29,7 @@ class EditPitchView extends ConsumerWidget {
           children: [
             Expanded(
               child: ReorderableListView.builder(
-
-                  ///shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
                   buildDefaultDragHandles: true,
                   itemBuilder: (context, index) {
                     if (index == pitch.chapters.length) {
@@ -41,9 +38,7 @@ class EditPitchView extends ConsumerWidget {
                         onLongPress: () {}, // disable reordering
                         onTap: () {
                           var newChapter = PitchChapter(
-                              name: "",
-                              durationSeconds:
-                                  const Duration(seconds: 30).inSeconds);
+                              name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
                           showDialog(
                               context: context,
                               builder: (_) => EditChapterView(
@@ -60,9 +55,8 @@ class EditPitchView extends ConsumerWidget {
                             Icons.add,
                             size: 30,
                           ),
-                          const SizedBox(width: 10),
-                          Text("add new chapter",
-                              style: Theme.of(context).textTheme.bodyLarge)
+                          const SizedBox(width: 15),
+                          Text("add new chapter", style: Theme.of(context).textTheme.bodyLarge)
                         ]),
                       );
                     }
@@ -72,8 +66,7 @@ class EditPitchView extends ConsumerWidget {
                         motion: const ScrollMotion(),
                         children: [
                           SlidableAction(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
+                            backgroundColor: Theme.of(context).colorScheme.secondary,
                             onPressed: (context) {
                               pitch.chapters.removeAt(index);
                               pitchData.updatePitch(pitch);
@@ -83,54 +76,49 @@ class EditPitchView extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      child: Container(
-                        height: max(
-                            pitch.chapters[index].duration.inSeconds /
-                                max(pitch.shortestChapterDuration.inSeconds,
-                                    10) *
-                                30,
-                            30 // minimum Size
-                            ),
-                        color: Colors.green[(9 - index % 9) * 100],
-                        child: GestureDetector(
-                          onTap: () => showDialog(
-                              context: context,
-                              builder: (_) => EditChapterView(
-                                    chapter: pitch.chapters[index],
-                                    onValueChanged: (chapter) {
-                                      pitch.chapters[index] = chapter;
-                                      pitchData.updatePitch(pitch);
-                                    },
-                                  )),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(pitch.chapters[index].name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineSmall),
-                                        Text(pitch.chapters[index].notes,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium),
-                                      ]),
-                                ),
+                      child: GestureDetector(
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (_) => EditChapterView(
+                                  chapter: pitch.chapters[index],
+                                  onValueChanged: (chapter) {
+                                    pitch.chapters[index] = chapter;
+                                    pitchData.updatePitch(pitch);
+                                  },
+                                )),
+                        child: Card(
+                          color: Colors.green[(6 - index % 9) * 100],
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              height: max(
+                                  pitch.chapters[index].duration.inSeconds /
+                                      max(pitch.shortestChapterDuration.inSeconds, 10) *
+                                      30,
+                                  30 // minimum Size
+                                  ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(pitch.chapters[index].name,
+                                                style: Theme.of(context).textTheme.headlineSmall),
+                                            Text(pitch.chapters[index].notes,
+                                                style: Theme.of(context).textTheme.bodyMedium),
+                                          ]),
+                                    ),
+                                  ),
+                                  const VerticalDivider(),
+                                  Text(durationAsString(pitch.chapters[index].duration),
+                                      style: Theme.of(context).textTheme.headlineSmall),
+                                ],
                               ),
-                              const VerticalDivider(),
-                              Text(
-                                  durationAsString(
-                                      pitch.chapters[index].duration),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -151,12 +139,16 @@ class EditPitchView extends ConsumerWidget {
                   }),
             ),
             Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                /* border: Border(
-                  top: BorderSide(
-                      color: Theme.of(context).dividerColor, width: 1),
-                ), */
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey,
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -164,13 +156,13 @@ class EditPitchView extends ConsumerWidget {
                   Text(
                     "Total: ",
                     style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                   ),
                   Text(
                     durationAsString(pitch.totalDuration),
                     style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                   ),
                   const SizedBox(
@@ -180,8 +172,8 @@ class EditPitchView extends ConsumerWidget {
               ),
             ),
             GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => PresentationView(pitch: pitch))),
+              onTap: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch))),
               child: Container(
                 height: 70,
                 width: double.infinity,
