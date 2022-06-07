@@ -87,7 +87,7 @@ class EditPitchView extends ConsumerWidget {
                                   },
                                 )),
                         child: Card(
-                          color: Colors.green[(6 - index % 9) * 100],
+                          color: Colors.primaries[index % (Colors.primaries.length)],
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: SizedBox(
