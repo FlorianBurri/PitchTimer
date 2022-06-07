@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
@@ -13,6 +16,10 @@ class EditPitchView extends ConsumerWidget {
 
   const EditPitchView({required this.pitch, Key? key}) : super(key: key);
 
+  String durationAsString(Duration duration) {
+    return "${duration.inSeconds ~/ 60}:${"${duration.inSeconds % 60}".padLeft(2, '0')}";
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pitchData = ref.watch(pitchDataProvider);
@@ -20,137 +27,176 @@ class EditPitchView extends ConsumerWidget {
         appBar: AppBar(
           title: Text(pitch.name),
         ),
-        body: Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              Expanded(
-                child: ReorderableListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    buildDefaultDragHandles: true,
-                    itemBuilder: (context, index) {
-                      return SizedBox(
+        body: Column(
+          children: [
+            Expanded(
+              child: ReorderableListView.builder(
+
+                  ///shrinkWrap: true,
+                  buildDefaultDragHandles: true,
+                  itemBuilder: (context, index) {
+                    if (index == pitch.chapters.length) {
+                      return GestureDetector(
                         key: Key(index.toString()),
-                        height: (pitch.chapters[index].duration.inSeconds /
-                            pitch.shortestChapterDuration.inSeconds *
-                            50),
-                        child: Card(
-                          elevation: 5,
-                          child: Slidable(
-                            endActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (context) {
-                                    pitch.chapters.removeAt(index);
-                                    pitchData.updatePitch(pitch);
-                                  },
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.secondary,
-                                  icon: Icons.delete,
-                                  label: 'Delete',
+                        onLongPress: () {}, // disable reordering
+                        onTap: () {
+                          var newChapter = PitchChapter(
+                              name: "",
+                              durationSeconds:
+                                  const Duration(seconds: 30).inSeconds);
+                          showDialog(
+                              context: context,
+                              builder: (_) => EditChapterView(
+                                    chapter: newChapter,
+                                    onValueChanged: (chapter) {
+                                      newChapter = chapter;
+                                      pitch.chapters.add(newChapter);
+                                      pitchData.updatePitch(pitch);
+                                    },
+                                  ));
+                        },
+                        child: Row(key: Key(index.toString()), children: [
+                          const Icon(
+                            Icons.add,
+                            size: 30,
+                          ),
+                          const SizedBox(width: 10),
+                          Text("add new chapter",
+                              style: Theme.of(context).textTheme.bodyLarge)
+                        ]),
+                      );
+                    }
+                    return Slidable(
+                      key: Key(index.toString()),
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                            onPressed: (context) {
+                              pitch.chapters.removeAt(index);
+                              pitchData.updatePitch(pitch);
+                            },
+                            icon: Icons.delete,
+                            label: 'Delete',
+                          ),
+                        ],
+                      ),
+                      child: Container(
+                        height: max(
+                            pitch.chapters[index].duration.inSeconds /
+                                max(pitch.shortestChapterDuration.inSeconds,
+                                    1) *
+                                30,
+                            30 // minimum Size
+                            ),
+                        color: Colors.green[(9 - index % 9) * 100],
+                        child: GestureDetector(
+                          onTap: () => showDialog(
+                              context: context,
+                              builder: (_) => EditChapterView(
+                                    chapter: pitch.chapters[index],
+                                    onValueChanged: (chapter) {
+                                      pitch.chapters[index] = chapter;
+                                      pitchData.updatePitch(pitch);
+                                    },
+                                  )),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(pitch.chapters[index].name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineSmall),
+                                        Text(pitch.chapters[index].notes,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium),
+                                      ]),
                                 ),
-                              ],
-                            ),
-                            child: ListTile(
-                              title: Text(pitch.chapters[index].name),
-                              subtitle: Text(
-                                "${pitch.chapters[index].duration.inSeconds} seconds",
                               ),
-                              onTap: () => showDialog(
-                                  context: context,
-                                  builder: (_) => EditChapterView(
-                                        chapter: pitch.chapters[index],
-                                        onValueChanged: (chapter) {
-                                          pitch.chapters[index] = chapter;
-                                          pitchData.updatePitch(pitch);
-                                        },
-                                      )),
-                            ),
+                              const VerticalDivider(),
+                              Text(
+                                  durationAsString(
+                                      pitch.chapters[index].duration),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall),
+                            ],
                           ),
                         ),
-                      );
-                    },
-                    itemCount: pitch.chapters.length,
-                    onReorder: (oldIndex, newIndex) {
-                      if (oldIndex < newIndex) {
-                        newIndex -= 1;
-                      }
-                      final chapter = pitch.chapters.removeAt(oldIndex);
-                      pitch.chapters.insert(newIndex, chapter);
-                      pitchData.updatePitch(pitch);
-                    }),
-              ),
-              IconButton(
-                  onPressed: () {
-                    var newChapter = PitchChapter(
-                        name: "",
-                        durationSeconds: const Duration(seconds: 30).inSeconds);
-                    showDialog(
-                        context: context,
-                        builder: (_) => EditChapterView(
-                              chapter: newChapter,
-                              onValueChanged: (chapter) {
-                                newChapter = chapter;
-                                pitch.chapters.add(newChapter);
-                                pitchData.updatePitch(pitch);
-                              },
-                            ));
+                      ),
+                    );
                   },
-                  icon: const Icon(
-                    Icons.add_circle,
-                    size: 40,
-                  )),
-              const Divider(),
-              Row(
+                  itemCount: pitch.chapters.length + 1,
+                  onReorder: (oldIndex, newIndex) {
+                    /// ignore moving below the add new widget
+                    if (newIndex == (pitch.chapters.length + 1)) {
+                      newIndex -= 1;
+                    }
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
+                    final chapter = pitch.chapters.removeAt(oldIndex);
+                    pitch.chapters.insert(newIndex, chapter);
+                    pitchData.updatePitch(pitch);
+                  }),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                /* border: Border(
+                  top: BorderSide(
+                      color: Theme.of(context).dividerColor, width: 1),
+                ), */
+              ),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    "Total time: ",
-                    style: Theme.of(context).textTheme.headlineSmall!,
-                  ),
-                  Container(
-                    height: 30,
-                    padding: const EdgeInsets.only(right: 5),
-                    child: SlidingNumber(
-                      number: pitch.totalDuration.inMinutes,
-                      style: Theme.of(context).textTheme.headlineSmall!,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeOutQuint,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 5,
+                    "Total: ",
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                          color: Colors.white,
+                        ),
                   ),
                   Text(
-                    "min",
-                    style: Theme.of(context).textTheme.headlineSmall!,
+                    durationAsString(pitch.totalDuration),
+                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                          color: Colors.white,
+                        ),
                   ),
                   const SizedBox(
                     width: 5,
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => PresentationView(pitch: pitch))),
-                child: Container(
-                  height: 70,
-                  width: double.infinity,
-                  color: Theme.of(context).colorScheme.primary,
-                  child: Center(
-                    child: Text(
-                      "START",
-                      style:
-                          Theme.of(context).textTheme.headlineLarge!.copyWith(
-                                color: Colors.white,
-                              ),
-                    ),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => PresentationView(pitch: pitch))),
+              child: Container(
+                height: 70,
+                width: double.infinity,
+                color: Theme.of(context).colorScheme.primary,
+                child: Center(
+                  child: Text(
+                    "START",
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                          color: Colors.white,
+                        ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ));
   }
 }

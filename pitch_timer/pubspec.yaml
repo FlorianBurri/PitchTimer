@@ -35,6 +35,7 @@ dependencies:
   sliding_number: ^0.0.4
   flex_color_scheme: ^5.0.1
   flutter_slidable: ^1.3.0
+  numberpicker: ^2.1.1
 
   # Utilities
   flutter_riverpod: ^2.0.0-dev.9
