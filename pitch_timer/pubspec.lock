@@ -546,13 +546,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  sliding_number:
-    dependency: "direct main"
-    description:
-      name: sliding_number
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.4"
   source_gen:
     dependency: transitive
     description:
