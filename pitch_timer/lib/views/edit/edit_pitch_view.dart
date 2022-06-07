@@ -87,7 +87,7 @@ class EditPitchView extends ConsumerWidget {
                         height: max(
                             pitch.chapters[index].duration.inSeconds /
                                 max(pitch.shortestChapterDuration.inSeconds,
-                                    1) *
+                                    10) *
                                 30,
                             30 // minimum Size
                             ),
