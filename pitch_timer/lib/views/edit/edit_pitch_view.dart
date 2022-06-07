@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
@@ -87,7 +88,8 @@ class EditPitchView extends ConsumerWidget {
                                   },
                                 )),
                         child: Card(
-                          color: Colors.primaries[index % (Colors.primaries.length)],
+                          color:
+                              Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: SizedBox(
@@ -97,25 +99,23 @@ class EditPitchView extends ConsumerWidget {
                                       30,
                                   30 // minimum Size
                                   ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: ListView(
                                 children: [
-                                  Expanded(
-                                    child: SingleChildScrollView(
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(pitch.chapters[index].name,
-                                                style: Theme.of(context).textTheme.headlineSmall),
-                                            Text(pitch.chapters[index].notes,
-                                                style: Theme.of(context).textTheme.bodyMedium),
-                                          ]),
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(pitch.chapters[index].name,
+                                          style: Theme.of(context).textTheme.headlineSmall),
+                                      Text(durationAsString(pitch.chapters[index].duration),
+                                          style: Theme.of(context).textTheme.headlineSmall),
+                                    ],
                                   ),
-                                  const VerticalDivider(),
-                                  Text(durationAsString(pitch.chapters[index].duration),
-                                      style: Theme.of(context).textTheme.headlineSmall),
+                                  if (pitch.chapters[index].notes.isNotEmpty)
+                                    const Divider(
+                                      thickness: 1.5,
+                                    ),
+                                  Text(pitch.chapters[index].notes,
+                                      style: Theme.of(context).textTheme.bodyMedium),
                                 ],
                               ),
                             ),
@@ -139,14 +139,13 @@ class EditPitchView extends ConsumerWidget {
                   }),
             ),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey,
-                    spreadRadius: 5,
+                    color: Colors.grey.shade900,
+                    spreadRadius: 0.7,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
                   ),
                 ],
               ),
@@ -172,8 +171,11 @@ class EditPitchView extends ConsumerWidget {
               ),
             ),
             GestureDetector(
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch))),
+              onTap: () {
+                HapticFeedback.heavyImpact();
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch)));
+              },
               child: Container(
                 height: 70,
                 width: double.infinity,
