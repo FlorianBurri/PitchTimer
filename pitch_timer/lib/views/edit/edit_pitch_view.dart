@@ -115,9 +115,18 @@ class EditPitchView extends ConsumerWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(pitch.chapters[index].name,
-                                          style: Theme.of(context).textTheme.headlineSmall),
-                                      Text(durationAsString(pitch.chapters[index].duration),
+                                      Expanded(
+                                        child: AutoSizeText(
+                                          pitch.chapters[index].name,
+                                          style: Theme.of(context).textTheme.headlineSmall,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.clip,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      AutoSizeText(durationAsString(pitch.chapters[index].duration),
                                           style: Theme.of(context).textTheme.headlineSmall),
                                     ],
                                   ),
