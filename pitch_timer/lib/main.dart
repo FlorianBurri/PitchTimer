@@ -38,9 +38,7 @@ class App extends StatelessWidget {
       localizationsDelegates: const [
         FormBuilderLocalizations.delegate,
       ],
-      theme: FlexThemeData.light(scheme: FlexScheme.jungle),
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.jungle),
-      themeMode: ThemeMode.system,
+      theme: FlexThemeData.light(scheme: FlexScheme.greyLaw),
       home: const PitchSelectionView(),
     );
   }

@@ -1,7 +1,8 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
@@ -9,7 +10,6 @@ import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/views/edit/edit_chapter_view.dart';
 import 'package:pitch_timer/views/presentation/presentation_view.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
-import 'package:sliding_number/sliding_number.dart';
 
 class EditPitchView extends ConsumerWidget {
   final PitchData pitch;
@@ -31,8 +31,7 @@ class EditPitchView extends ConsumerWidget {
           children: [
             Expanded(
               child: ReorderableListView.builder(
-
-                  ///shrinkWrap: true,
+                  padding: const EdgeInsets.all(8),
                   buildDefaultDragHandles: true,
                   itemBuilder: (context, index) {
                     if (index == pitch.chapters.length) {
@@ -41,9 +40,7 @@ class EditPitchView extends ConsumerWidget {
                         onLongPress: () {}, // disable reordering
                         onTap: () {
                           var newChapter = PitchChapter(
-                              name: "",
-                              durationSeconds:
-                                  const Duration(seconds: 30).inSeconds);
+                              name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
                           showDialog(
                               context: context,
                               builder: (_) => EditChapterView(
@@ -56,81 +53,95 @@ class EditPitchView extends ConsumerWidget {
                                   ));
                         },
                         child: Row(key: Key(index.toString()), children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
                           const Icon(
                             Icons.add,
                             size: 30,
                           ),
-                          const SizedBox(width: 10),
-                          Text("add new chapter",
-                              style: Theme.of(context).textTheme.bodyLarge)
+                          const SizedBox(width: 8),
+                          Text("Add new chapter", style: Theme.of(context).textTheme.bodyLarge)
                         ]),
                       );
                     }
+                    final bgColor =
+                        Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3);
                     return Slidable(
                       key: Key(index.toString()),
                       endActionPane: ActionPane(
-                        motion: const ScrollMotion(),
+                        motion: const DrawerMotion(),
                         children: [
                           SlidableAction(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
+                            backgroundColor: bgColor,
                             onPressed: (context) {
                               pitch.chapters.removeAt(index);
                               pitchData.updatePitch(pitch);
                             },
                             icon: Icons.delete,
                             label: 'Delete',
+                            borderRadius: BorderRadius.circular(8),
+                            foregroundColor: Colors.black,
                           ),
                         ],
                       ),
-                      child: Container(
-                        height: max(
-                            pitch.chapters[index].duration.inSeconds /
-                                max(pitch.shortestChapterDuration.inSeconds,
-                                    10) *
-                                30,
-                            30 // minimum Size
-                            ),
-                        color: Colors.green[(9 - index % 9) * 100],
-                        child: GestureDetector(
-                          onTap: () => showDialog(
-                              context: context,
-                              builder: (_) => EditChapterView(
-                                    chapter: pitch.chapters[index],
-                                    onValueChanged: (chapter) {
-                                      pitch.chapters[index] = chapter;
-                                      pitchData.updatePitch(pitch);
-                                    },
-                                  )),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(pitch.chapters[index].name,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineSmall),
-                                        Text(pitch.chapters[index].notes,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium),
-                                      ]),
-                                ),
+                      child: GestureDetector(
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (_) => EditChapterView(
+                                  chapter: pitch.chapters[index],
+                                  onValueChanged: (chapter) {
+                                    pitch.chapters[index] = chapter;
+                                    pitchData.updatePitch(pitch);
+                                  },
+                                )),
+                        child: Card(
+                          color: bgColor,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: max(
+                                    pitch.chapters[index].duration.inSeconds /
+                                        max(pitch.shortestChapterDuration.inSeconds, 10) *
+                                        20,
+                                    45 // minimum Size
+                                    ),
                               ),
-                              const VerticalDivider(),
-                              Text(
-                                  durationAsString(
-                                      pitch.chapters[index].duration),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall),
-                            ],
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Pitch title and duration
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: AutoSizeText(
+                                          pitch.chapters[index].name,
+                                          style: Theme.of(context).textTheme.headlineSmall,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.clip,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      AutoSizeText(durationAsString(pitch.chapters[index].duration),
+                                          style: Theme.of(context).textTheme.headlineSmall),
+                                    ],
+                                  ),
+                                  // Notes
+                                  if (pitch.chapters[index].notes.isNotEmpty)
+                                    Expanded(
+                                      child: AutoSizeText(
+                                        pitch.chapters[index].notes,
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        overflow: TextOverflow.fade,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -152,25 +163,26 @@ class EditPitchView extends ConsumerWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                /* border: Border(
-                  top: BorderSide(
-                      color: Theme.of(context).dividerColor, width: 1),
-                ), */
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade900,
+                    spreadRadius: 0.7,
+                    blurRadius: 7,
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    "Total: ",
-                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                          color: Colors.white,
-                        ),
+                  const Icon(Icons.timer_outlined),
+                  const SizedBox(
+                    width: 5,
                   ),
                   Text(
                     durationAsString(pitch.totalDuration),
                     style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                   ),
                   const SizedBox(
@@ -180,18 +192,30 @@ class EditPitchView extends ConsumerWidget {
               ),
             ),
             GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => PresentationView(pitch: pitch))),
+              onTap: () {
+                HapticFeedback.heavyImpact();
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch)));
+              },
               child: Container(
-                height: 70,
+                height: 80,
                 width: double.infinity,
                 color: Theme.of(context).colorScheme.primary,
                 child: Center(
-                  child: Text(
-                    "START",
-                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                          color: Colors.white,
-                        ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.play_arrow_rounded,
+                        size: 45,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "Start",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Colors.white,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
               ),
