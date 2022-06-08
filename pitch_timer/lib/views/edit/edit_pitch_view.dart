@@ -53,19 +53,22 @@ class EditPitchView extends ConsumerWidget {
                                   ));
                         },
                         child: Row(key: Key(index.toString()), children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
                           const Icon(
                             Icons.add,
                             size: 30,
                           ),
-                          const SizedBox(width: 15),
-                          Text("add new chapter", style: Theme.of(context).textTheme.bodyLarge)
+                          const SizedBox(width: 8),
+                          Text("Add new chapter", style: Theme.of(context).textTheme.bodyLarge)
                         ]),
                       );
                     }
                     return Slidable(
                       key: Key(index.toString()),
                       endActionPane: ActionPane(
-                        motion: const ScrollMotion(),
+                        motion: const DrawerMotion(),
                         children: [
                           SlidableAction(
                             backgroundColor: Theme.of(context).colorScheme.secondary,
@@ -75,6 +78,7 @@ class EditPitchView extends ConsumerWidget {
                             },
                             icon: Icons.delete,
                             label: 'Delete',
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ],
                       ),
@@ -92,14 +96,14 @@ class EditPitchView extends ConsumerWidget {
                           color:
                               Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(12),
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                 maxHeight: max(
                                     pitch.chapters[index].duration.inSeconds /
                                         max(pitch.shortestChapterDuration.inSeconds, 10) *
-                                        25,
-                                    30 // minimum Size
+                                        20,
+                                    45 // minimum Size
                                     ),
                               ),
                               child: Column(

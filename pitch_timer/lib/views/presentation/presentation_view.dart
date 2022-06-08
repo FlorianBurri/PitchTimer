@@ -15,6 +15,7 @@ class PresentationView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(pitch.name),
+        elevation: 5,
       ),
       body: StreamBuilder(
           stream: Stream.periodic(
@@ -35,7 +36,16 @@ class PresentationView extends StatelessWidget {
                 child: Column(
               children: [
                 Container(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade900,
+                        spreadRadius: 0.2,
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
                   child: ListView(
                     physics: const ClampingScrollPhysics(),
                     padding: const EdgeInsets.all(20),
@@ -43,10 +53,7 @@ class PresentationView extends StatelessWidget {
                     children: [
                       Text("previous", style: Theme.of(context).textTheme.labelMedium),
                       Text(previousChapter?.name ?? '',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
-                              ?.copyWith(color: Colors.white)),
+                          style: Theme.of(context).textTheme.headlineMedium),
                     ],
                   ),
                 ),
@@ -84,7 +91,16 @@ class PresentationView extends StatelessWidget {
                   ]),
                 ),
                 Container(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade900,
+                        spreadRadius: 0.2,
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
                   child: ListView(
                     physics: const ClampingScrollPhysics(),
                     padding: const EdgeInsets.all(20),
@@ -92,10 +108,7 @@ class PresentationView extends StatelessWidget {
                     children: [
                       Text("next", style: Theme.of(context).textTheme.labelMedium),
                       Text(nextChapter?.name ?? '',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
-                              ?.copyWith(color: Colors.white)),
+                          style: Theme.of(context).textTheme.headlineMedium),
                     ],
                   ),
                 ),
