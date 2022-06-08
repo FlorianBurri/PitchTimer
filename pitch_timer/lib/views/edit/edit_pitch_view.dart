@@ -65,13 +65,15 @@ class EditPitchView extends ConsumerWidget {
                         ]),
                       );
                     }
+                    final bgColor =
+                        Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3);
                     return Slidable(
                       key: Key(index.toString()),
                       endActionPane: ActionPane(
                         motion: const DrawerMotion(),
                         children: [
                           SlidableAction(
-                            backgroundColor: Theme.of(context).colorScheme.secondary,
+                            backgroundColor: bgColor,
                             onPressed: (context) {
                               pitch.chapters.removeAt(index);
                               pitchData.updatePitch(pitch);
@@ -79,6 +81,7 @@ class EditPitchView extends ConsumerWidget {
                             icon: Icons.delete,
                             label: 'Delete',
                             borderRadius: BorderRadius.circular(8),
+                            foregroundColor: Colors.black,
                           ),
                         ],
                       ),
@@ -93,8 +96,7 @@ class EditPitchView extends ConsumerWidget {
                                   },
                                 )),
                         child: Card(
-                          color:
-                              Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3),
+                          color: bgColor,
                           child: Padding(
                             padding: const EdgeInsets.all(12),
                             child: ConstrainedBox(
@@ -191,11 +193,20 @@ class EditPitchView extends ConsumerWidget {
                 width: double.infinity,
                 color: Theme.of(context).colorScheme.primary,
                 child: Center(
-                  child: Text(
-                    "START",
-                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                          color: Colors.white,
-                        ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.play_arrow_rounded,
+                        size: 45,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "Start",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Colors.white,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
               ),

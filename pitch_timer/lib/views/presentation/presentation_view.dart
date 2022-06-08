@@ -48,7 +48,7 @@ class PresentationView extends StatelessWidget {
                   ),
                   child: ListView(
                     physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(10),
                     shrinkWrap: true,
                     children: [
                       Text("previous", style: Theme.of(context).textTheme.labelMedium),
@@ -58,37 +58,41 @@ class PresentationView extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    Expanded(
-                      child: ListView(
-                        physics: const ClampingScrollPhysics(),
-                        padding: const EdgeInsets.all(20),
-                        shrinkWrap: true,
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(currentChapter.name,
-                              style: Theme.of(context).textTheme.displaySmall),
-                          const SizedBox(height: 20),
-                          Text(currentChapter.notes, style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 30,
-                      child: RotatedBox(
-                        quarterTurns: 1,
-                        child: LinearProgressIndicator(
-                          minHeight: 20,
-                          color: Theme.of(context).colorScheme.secondary,
-                          value: (snapshot.data! - pastChaptersTime).inMilliseconds /
-                              currentChapter.duration.inMilliseconds,
+                  child: Container(
+                    color: Theme.of(context).colorScheme.surfaceTint.withOpacity(0.08),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                      Expanded(
+                        child: ListView(
+                          physics: const ClampingScrollPhysics(),
+                          padding: const EdgeInsets.all(25),
+                          shrinkWrap: true,
+                          children: [
+                            const SizedBox(height: 20),
+                            Text(currentChapter.name,
+                                style: Theme.of(context).textTheme.displaySmall),
+                            const SizedBox(height: 20),
+                            Text(currentChapter.notes,
+                                style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ]),
+                      SizedBox(
+                        width: 30,
+                        child: RotatedBox(
+                          quarterTurns: 1,
+                          child: LinearProgressIndicator(
+                            minHeight: 20,
+                            color: Theme.of(context).colorScheme.secondary,
+                            value: (snapshot.data! - pastChaptersTime).inMilliseconds /
+                                currentChapter.duration.inMilliseconds,
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
