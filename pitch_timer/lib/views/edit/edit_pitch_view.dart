@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,15 +93,19 @@ class EditPitchView extends ConsumerWidget {
                               Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              height: max(
-                                  pitch.chapters[index].duration.inSeconds /
-                                      max(pitch.shortestChapterDuration.inSeconds, 10) *
-                                      30,
-                                  30 // minimum Size
-                                  ),
-                              child: ListView(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: max(
+                                    pitch.chapters[index].duration.inSeconds /
+                                        max(pitch.shortestChapterDuration.inSeconds, 10) *
+                                        25,
+                                    30 // minimum Size
+                                    ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Pitch title and duration
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -110,12 +115,15 @@ class EditPitchView extends ConsumerWidget {
                                           style: Theme.of(context).textTheme.headlineSmall),
                                     ],
                                   ),
+                                  // Notes
                                   if (pitch.chapters[index].notes.isNotEmpty)
-                                    const Divider(
-                                      thickness: 1.5,
+                                    Expanded(
+                                      child: AutoSizeText(
+                                        pitch.chapters[index].notes,
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        overflow: TextOverflow.fade,
+                                      ),
                                     ),
-                                  Text(pitch.chapters[index].notes,
-                                      style: Theme.of(context).textTheme.bodyMedium),
                                 ],
                               ),
                             ),
@@ -152,11 +160,9 @@ class EditPitchView extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    "Total: ",
-                    style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                          color: Colors.black,
-                        ),
+                  const Icon(Icons.timer_outlined),
+                  const SizedBox(
+                    width: 5,
                   ),
                   Text(
                     durationAsString(pitch.totalDuration),
@@ -177,7 +183,7 @@ class EditPitchView extends ConsumerWidget {
                     .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch)));
               },
               child: Container(
-                height: 70,
+                height: 80,
                 width: double.infinity,
                 color: Theme.of(context).colorScheme.primary,
                 child: Center(
