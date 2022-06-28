@@ -17,7 +17,6 @@ class EditPitchView extends ConsumerWidget {
   int scalingFactor = 10;
   double totalDrag = 0;
   int draggedChapterInitDuration = 0;
-  int dragTimeStepSize = 30;
 
   EditPitchView({required this.pitch, Key? key}) : super(key: key) {
     updateScalingFactor();
@@ -25,6 +24,15 @@ class EditPitchView extends ConsumerWidget {
 
   void updateScalingFactor() {
     scalingFactor = max(pitch.shortestChapterDuration.inSeconds, 10);
+  }
+
+  String durationAsString(Duration duration) {
+    return "${duration.inSeconds ~/ 60}:${"${duration.inSeconds % 60}".padLeft(2, '0')}";
+  }
+
+  int roundSeconds(int seconds) {
+    /* Round seconds to a appropiate value, depending on the current scale */
+    int dragTimeStepSize = 0;
     if (scalingFactor < 30) {
       dragTimeStepSize = 5;
     } else if (scalingFactor < 90) {
@@ -34,13 +42,6 @@ class EditPitchView extends ConsumerWidget {
     } else if (scalingFactor < 480) {
       dragTimeStepSize = 60;
     }
-  }
-
-  String durationAsString(Duration duration) {
-    return "${duration.inSeconds ~/ 60}:${"${duration.inSeconds % 60}".padLeft(2, '0')}";
-  }
-
-  int roundSeconds(int seconds) {
     return max((seconds / dragTimeStepSize).round() * dragTimeStepSize,
         dragTimeStepSize);
   }
