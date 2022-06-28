@@ -13,11 +13,36 @@ import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
 class EditPitchView extends ConsumerWidget {
   final PitchData pitch;
+  final double shortestChapterSize = 28;
+  int scalingFactor = 10;
+  double totalDrag = 0;
+  int draggedChapterInitDuration = 0;
+  int dragTimeStepSize = 30;
 
-  const EditPitchView({required this.pitch, Key? key}) : super(key: key);
+  EditPitchView({required this.pitch, Key? key}) : super(key: key) {
+    updateScalingFactor();
+  }
+
+  void updateScalingFactor() {
+    scalingFactor = max(pitch.shortestChapterDuration.inSeconds, 10);
+    if (scalingFactor < 30) {
+      dragTimeStepSize = 5;
+    } else if (scalingFactor < 90) {
+      dragTimeStepSize = 10;
+    } else if (scalingFactor < 240) {
+      dragTimeStepSize = 30;
+    } else if (scalingFactor < 480) {
+      dragTimeStepSize = 60;
+    }
+  }
 
   String durationAsString(Duration duration) {
     return "${duration.inSeconds ~/ 60}:${"${duration.inSeconds % 60}".padLeft(2, '0')}";
+  }
+
+  int roundSeconds(int seconds) {
+    return max((seconds / dragTimeStepSize).round() * dragTimeStepSize,
+        dragTimeStepSize);
   }
 
   @override
@@ -40,7 +65,9 @@ class EditPitchView extends ConsumerWidget {
                         onLongPress: () {}, // disable reordering
                         onTap: () {
                           var newChapter = PitchChapter(
-                              name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
+                              name: "",
+                              durationSeconds:
+                                  const Duration(seconds: 30).inSeconds);
                           showDialog(
                               context: context,
                               builder: (_) => EditChapterView(
@@ -49,6 +76,7 @@ class EditPitchView extends ConsumerWidget {
                                       newChapter = chapter;
                                       pitch.chapters.add(newChapter);
                                       pitchData.updatePitch(pitch);
+                                      updateScalingFactor();
                                     },
                                   ));
                         },
@@ -61,12 +89,13 @@ class EditPitchView extends ConsumerWidget {
                             size: 30,
                           ),
                           const SizedBox(width: 8),
-                          Text("Add new chapter", style: Theme.of(context).textTheme.bodyLarge)
+                          Text("Add new chapter",
+                              style: Theme.of(context).textTheme.bodyLarge)
                         ]),
                       );
                     }
-                    final bgColor =
-                        Colors.primaries[index % (Colors.primaries.length)].withOpacity(0.3);
+                    final bgColor = Colors
+                        .primaries[index % (Colors.primaries.length)].shade100;
                     return Slidable(
                       key: Key(index.toString()),
                       endActionPane: ActionPane(
@@ -85,65 +114,135 @@ class EditPitchView extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      child: GestureDetector(
-                        onTap: () => showDialog(
-                            context: context,
-                            builder: (_) => EditChapterView(
-                                  chapter: pitch.chapters[index],
-                                  onValueChanged: (chapter) {
-                                    pitch.chapters[index] = chapter;
-                                    pitchData.updatePitch(pitch);
-                                  },
-                                )),
-                        child: Card(
-                          color: bgColor,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: max(
-                                    pitch.chapters[index].duration.inSeconds /
-                                        max(pitch.shortestChapterDuration.inSeconds, 10) *
-                                        20,
-                                    45 // minimum Size
-                                    ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Pitch title and duration
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () => showDialog(
+                                context: context,
+                                builder: (_) => EditChapterView(
+                                      chapter: pitch.chapters[index],
+                                      onValueChanged: (chapter) {
+                                        pitch.chapters[index] = chapter;
+                                        pitchData.updatePitch(pitch);
+                                        updateScalingFactor();
+                                      },
+                                    )),
+                            child: Card(
+                              color: bgColor,
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight: max(
+                                            pitch.chapters[index].duration
+                                                    .inSeconds /
+                                                max(scalingFactor, 10),
+                                            1) *
+                                        shortestChapterSize,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        child: AutoSizeText(
-                                          pitch.chapters[index].name,
-                                          style: Theme.of(context).textTheme.headlineSmall,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.clip,
+                                      /// Pitch title and duration
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: AutoSizeText(
+                                              pitch.chapters[index].name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.clip,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          AutoSizeText(
+                                              durationAsString(pitch
+                                                  .chapters[index].duration),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall),
+                                        ],
+                                      ),
+                                      // Notes
+                                      if (pitch
+                                          .chapters[index].notes.isNotEmpty)
+                                        Expanded(
+                                          child: AutoSizeText(
+                                            pitch.chapters[index].notes,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                            overflow: TextOverflow.fade,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 15,
-                                      ),
-                                      AutoSizeText(durationAsString(pitch.chapters[index].duration),
-                                          style: Theme.of(context).textTheme.headlineSmall),
                                     ],
                                   ),
-                                  // Notes
-                                  if (pitch.chapters[index].notes.isNotEmpty)
-                                    Expanded(
-                                      child: AutoSizeText(
-                                        pitch.chapters[index].notes,
-                                        style: Theme.of(context).textTheme.bodyMedium,
-                                        overflow: TextOverflow.fade,
-                                      ),
-                                    ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          Positioned(
+                              bottom: -6,
+                              right: 70,
+                              child: GestureDetector(
+                                onLongPress: () {}, // disable reordering
+                                onVerticalDragStart: (details) {
+                                  draggedChapterInitDuration =
+                                      pitch.chapters[index].durationSeconds;
+                                  totalDrag = 0;
+                                },
+                                onVerticalDragUpdate: (details) {
+                                  totalDrag += details.delta.dy;
+                                  var updatedChapter = PitchChapter(
+                                      name: pitch.chapters[index].name,
+                                      notes: pitch.chapters[index].notes,
+                                      durationSeconds: roundSeconds(
+                                          draggedChapterInitDuration +
+                                              totalDrag *
+                                                  scalingFactor ~/
+                                                  shortestChapterSize));
+                                  pitch.chapters[index] = updatedChapter;
+                                  pitchData.updatePitch(pitch);
+                                },
+                                onVerticalDragEnd: (details) {
+                                  var updatedChapter = PitchChapter(
+                                      name: pitch.chapters[index].name,
+                                      notes: pitch.chapters[index].notes,
+                                      durationSeconds: roundSeconds(pitch
+                                          .chapters[index].durationSeconds));
+                                  pitch.chapters[index] = updatedChapter;
+                                  pitchData.updatePitch(pitch);
+                                  updateScalingFactor();
+                                },
+                                child: Container(
+                                  /// Extending drag gesture area
+                                  height: 40,
+                                  width: 60,
+                                  color: Colors.transparent,
+                                  child: Center(
+                                    child: SizedBox(
+                                        height: 32,
+                                        width: 40,
+                                        child: Card(
+                                          elevation: 5,
+                                          color: bgColor,
+                                          child: Column(
+                                            children: const [
+                                              Icon(Icons.unfold_more),
+                                            ],
+                                          ),
+                                        )),
+                                  ),
+                                ),
+                              )),
+                        ],
                       ),
                     );
                   },
@@ -194,8 +293,8 @@ class EditPitchView extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 HapticFeedback.heavyImpact();
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch)));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => PresentationView(pitch: pitch)));
               },
               child: Container(
                 height: 80,

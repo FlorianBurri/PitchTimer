@@ -8,7 +8,8 @@ class EditChapterView extends StatefulWidget {
   final PitchChapter chapter;
   final void Function(PitchChapter) onValueChanged;
 
-  EditChapterView({required this.chapter, required this.onValueChanged, Key? key})
+  const EditChapterView(
+      {required this.chapter, required this.onValueChanged, Key? key})
       : super(key: key);
 
   @override
@@ -42,8 +43,10 @@ class _EditChapterViewState extends State<EditChapterView> {
                 name: 'name',
                 initialValue: widget.chapter.name,
                 decoration: InputDecoration(
-                  labelStyle:
-                      Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.black54),
+                  labelStyle: Theme.of(context)
+                      .textTheme
+                      .labelLarge!
+                      .copyWith(color: Colors.black54),
                   labelText: 'Chapter name',
                   border: const OutlineInputBorder(),
                 ),
@@ -57,8 +60,10 @@ class _EditChapterViewState extends State<EditChapterView> {
                 name: 'notes',
                 initialValue: widget.chapter.notes,
                 decoration: InputDecoration(
-                  labelStyle:
-                      Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.black54),
+                  labelStyle: Theme.of(context)
+                      .textTheme
+                      .labelLarge!
+                      .copyWith(color: Colors.black54),
                   labelText: 'Notes',
                   border: const OutlineInputBorder(),
                 ),
@@ -68,7 +73,10 @@ class _EditChapterViewState extends State<EditChapterView> {
               ),
               const SizedBox(height: 15),
               Text("Duration: ",
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.black54)),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelLarge!
+                      .copyWith(color: Colors.black54)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -90,7 +98,7 @@ class _EditChapterViewState extends State<EditChapterView> {
                   NumberPicker(
                     value: _durationSeconds!,
                     minValue: 0,
-                    maxValue: 55,
+                    maxValue: 59,
                     itemHeight: 40,
                     itemWidth: 60,
                     step: 5,
@@ -107,9 +115,11 @@ class _EditChapterViewState extends State<EditChapterView> {
                       widget.onValueChanged(PitchChapter(
                         name: _formKey.currentState?.value['name'] as String,
                         notes: _formKey.currentState?.value['notes'] as String,
-                        durationSeconds:
-                            (_durationMinutes ?? widget.chapter.durationSeconds ~/ 60) * 60 +
-                                (_durationSeconds ?? widget.chapter.durationSeconds % 60),
+                        durationSeconds: (_durationMinutes ??
+                                    widget.chapter.durationSeconds ~/ 60) *
+                                60 +
+                            (_durationSeconds ??
+                                widget.chapter.durationSeconds % 60),
                       ));
                       Navigator.of(context).pop();
                     }
