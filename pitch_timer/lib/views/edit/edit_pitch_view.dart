@@ -42,8 +42,7 @@ class EditPitchView extends ConsumerWidget {
     } else if (scalingFactor < 480) {
       dragTimeStepSize = 60;
     }
-    return max((seconds / dragTimeStepSize).round() * dragTimeStepSize,
-        dragTimeStepSize);
+    return max((seconds / dragTimeStepSize).round() * dragTimeStepSize, dragTimeStepSize);
   }
 
   @override
@@ -66,9 +65,7 @@ class EditPitchView extends ConsumerWidget {
                         onLongPress: () {}, // disable reordering
                         onTap: () {
                           var newChapter = PitchChapter(
-                              name: "",
-                              durationSeconds:
-                                  const Duration(seconds: 30).inSeconds);
+                              name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
                           showDialog(
                               context: context,
                               builder: (_) => EditChapterView(
@@ -90,13 +87,11 @@ class EditPitchView extends ConsumerWidget {
                             size: 30,
                           ),
                           const SizedBox(width: 8),
-                          Text("Add new chapter",
-                              style: Theme.of(context).textTheme.bodyLarge)
+                          Text("Add new chapter", style: Theme.of(context).textTheme.bodyLarge)
                         ]),
                       );
                     }
-                    final bgColor = Colors
-                        .primaries[index % (Colors.primaries.length)].shade100;
+                    final bgColor = Colors.primaries[index % (Colors.primaries.length)].shade100;
                     return Slidable(
                       key: Key(index.toString()),
                       endActionPane: ActionPane(
@@ -135,27 +130,22 @@ class EditPitchView extends ConsumerWidget {
                                 child: ConstrainedBox(
                                   constraints: BoxConstraints(
                                     maxHeight: max(
-                                            pitch.chapters[index].duration
-                                                    .inSeconds /
+                                            pitch.chapters[index].duration.inSeconds /
                                                 max(scalingFactor, 10),
                                             1) *
                                         shortestChapterSize,
                                   ),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       /// Pitch title and duration
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: AutoSizeText(
                                               pitch.chapters[index].name,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineSmall,
+                                              style: Theme.of(context).textTheme.headlineSmall,
                                               maxLines: 1,
                                               overflow: TextOverflow.clip,
                                             ),
@@ -164,22 +154,16 @@ class EditPitchView extends ConsumerWidget {
                                             width: 15,
                                           ),
                                           AutoSizeText(
-                                              durationAsString(pitch
-                                                  .chapters[index].duration),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineSmall),
+                                              durationAsString(pitch.chapters[index].duration),
+                                              style: Theme.of(context).textTheme.headlineSmall),
                                         ],
                                       ),
                                       // Notes
-                                      if (pitch
-                                          .chapters[index].notes.isNotEmpty)
+                                      if (pitch.chapters[index].notes.isNotEmpty)
                                         Expanded(
                                           child: AutoSizeText(
                                             pitch.chapters[index].notes,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium,
+                                            style: Theme.of(context).textTheme.bodyMedium,
                                             overflow: TextOverflow.fade,
                                           ),
                                         ),
@@ -204,11 +188,8 @@ class EditPitchView extends ConsumerWidget {
                                   var updatedChapter = PitchChapter(
                                       name: pitch.chapters[index].name,
                                       notes: pitch.chapters[index].notes,
-                                      durationSeconds: roundSeconds(
-                                          draggedChapterInitDuration +
-                                              totalDrag *
-                                                  scalingFactor ~/
-                                                  shortestChapterSize));
+                                      durationSeconds: roundSeconds(draggedChapterInitDuration +
+                                          totalDrag * scalingFactor ~/ shortestChapterSize));
                                   pitch.chapters[index] = updatedChapter;
                                   pitchData.updatePitch(pitch);
                                 },
@@ -216,8 +197,8 @@ class EditPitchView extends ConsumerWidget {
                                   var updatedChapter = PitchChapter(
                                       name: pitch.chapters[index].name,
                                       notes: pitch.chapters[index].notes,
-                                      durationSeconds: roundSeconds(pitch
-                                          .chapters[index].durationSeconds));
+                                      durationSeconds:
+                                          roundSeconds(pitch.chapters[index].durationSeconds));
                                   pitch.chapters[index] = updatedChapter;
                                   pitchData.updatePitch(pitch);
                                   updateScalingFactor();
@@ -294,8 +275,8 @@ class EditPitchView extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 HapticFeedback.heavyImpact();
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => PresentationView(pitch: pitch)));
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => PresentationView(pitch: pitch)));
               },
               child: Container(
                 height: 80,
