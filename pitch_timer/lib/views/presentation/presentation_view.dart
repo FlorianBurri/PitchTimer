@@ -1,20 +1,58 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 
-class PresentationView extends StatelessWidget {
+class PresentationView extends StatefulWidget {
   final PitchData pitch;
 
   const PresentationView({required this.pitch, Key? key}) : super(key: key);
 
   @override
+  State<PresentationView> createState() => _PresentationViewState();
+}
+
+class _PresentationViewState extends State<PresentationView> {
+  static const double progressIndicatorWidth = 50;
+
+  DateTime start = DateTime.now();
+  int chapterIndex = 0;
+  bool isPaused = false;
+  Duration pauseDuration = Duration.zero;
+
+  void skipPrevious(Duration duration) {
+    if (duration.inSeconds < 2 && chapterIndex > 0) {
+      chapterIndex = chapterIndex - 1;
+    }
+    start = DateTime.now();
+    pauseDuration = Duration.zero;
+  }
+
+  void pause(Duration duration) {
+    if (isPaused) {
+      /// continue where paused
+      start = DateTime.now().subtract(pauseDuration);
+    } else {
+      pauseDuration = duration;
+    }
+    isPaused = !isPaused;
+  }
+
+  void skipNext() {
+    if ((chapterIndex + 1) < widget.pitch.chapters.length) {
+      chapterIndex = chapterIndex + 1;
+      start = DateTime.now();
+    }
+    pauseDuration = Duration.zero;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final start = DateTime.now();
     return Scaffold(
       appBar: AppBar(
-        title: Text(pitch.name),
+        title: Text(widget.pitch.name),
         elevation: 5,
       ),
       body: StreamBuilder(
@@ -22,20 +60,23 @@ class PresentationView extends StatelessWidget {
               const Duration(milliseconds: 10), (int _) => DateTime.now().difference(start)),
           initialData: Duration.zero,
           builder: (context, AsyncSnapshot<Duration> snapshot) {
-            int? chapterIndex = getChapterIndexForTime(snapshot.data!, pitch.chapters);
+            var chapters = widget.pitch.chapters;
+            if (!isPaused &&
+                (snapshot.data! > chapters[chapterIndex].duration) &&
+                ((chapterIndex + 1) < chapters.length)) {
+              chapterIndex = chapterIndex + 1;
+              start = DateTime.now();
+            }
 
-            final previousChapter =
-                (chapterIndex ?? 0) > 0 ? pitch.chapters[chapterIndex! - 1] : null;
-            final currentChapter = pitch.chapters[chapterIndex ?? 0];
+            final previousChapter = (chapterIndex) > 0 ? chapters[chapterIndex - 1] : null;
+            final currentChapter = chapters[chapterIndex];
             final nextChapter =
-                (chapterIndex ?? pitch.chapters.length) < (pitch.chapters.length - 1)
-                    ? pitch.chapters[chapterIndex! + 1]
-                    : null;
-            Duration pastChaptersTime = getPastChaptersTime(pitch.chapters, chapterIndex);
+                (chapterIndex) < (chapters.length - 1) ? chapters[chapterIndex + 1] : null;
             return Center(
                 child: Column(
               children: [
                 Container(
+                  height: 90,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     boxShadow: [
@@ -52,8 +93,11 @@ class PresentationView extends StatelessWidget {
                     shrinkWrap: true,
                     children: [
                       Text("previous", style: Theme.of(context).textTheme.labelMedium),
-                      Text(previousChapter?.name ?? '',
-                          style: Theme.of(context).textTheme.headlineMedium),
+                      AutoSizeText(
+                        previousChapter?.name ?? '',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                        maxLines: 1,
+                      ),
                     ],
                   ),
                 ),
@@ -79,22 +123,65 @@ class PresentationView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        width: 30,
-                        child: RotatedBox(
-                          quarterTurns: 1,
-                          child: LinearProgressIndicator(
-                            minHeight: 20,
-                            color: Theme.of(context).colorScheme.secondary,
-                            value: (snapshot.data! - pastChaptersTime).inMilliseconds /
-                                currentChapter.duration.inMilliseconds,
+                      Stack(
+                        children: [
+                          SizedBox(
+                            width: progressIndicatorWidth,
+                            child: RotatedBox(
+                              quarterTurns: 1,
+                              child: LinearProgressIndicator(
+                                minHeight: 20,
+                                color: Theme.of(context).colorScheme.secondary,
+                                value: (isPaused
+                                        ? pauseDuration.inMilliseconds.toDouble()
+                                        : snapshot.data!.inMilliseconds) /
+                                    currentChapter.duration.inMilliseconds,
+                              ),
+                            ),
                           ),
-                        ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            width: progressIndicatorWidth,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => skipPrevious(snapshot.data!),
+                                  child: const RotatedBox(
+                                      quarterTurns: 1,
+                                      child: Icon(
+                                        Icons.skip_previous,
+                                        size: progressIndicatorWidth,
+                                      )),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => pause(snapshot.data!),
+                                    child: Icon(
+                                      isPaused ? Icons.play_arrow : Icons.pause,
+                                      size: progressIndicatorWidth,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: skipNext,
+                                  child: const RotatedBox(
+                                      quarterTurns: 1,
+                                      child: Icon(
+                                        Icons.skip_next,
+                                        size: progressIndicatorWidth,
+                                      )),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
                       ),
                     ]),
                   ),
                 ),
                 Container(
+                  height: 90,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceVariant,
                     boxShadow: [
@@ -111,8 +198,11 @@ class PresentationView extends StatelessWidget {
                     shrinkWrap: true,
                     children: [
                       Text("next", style: Theme.of(context).textTheme.labelMedium),
-                      Text(nextChapter?.name ?? '',
-                          style: Theme.of(context).textTheme.headlineMedium),
+                      AutoSizeText(
+                        nextChapter?.name ?? '',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                        maxLines: 1,
+                      ),
                     ],
                   ),
                 ),
