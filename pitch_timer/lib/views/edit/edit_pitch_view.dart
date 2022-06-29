@@ -12,6 +12,8 @@ import 'package:pitch_timer/views/edit/edit_chapter_view.dart';
 import 'package:pitch_timer/views/presentation/presentation_view.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
+import 'edit_pitch_name_view.dart';
+
 class EditPitchView extends StatefulWidget {
   final PitchData pitch;
   final double shortestChapterSize = 28;
@@ -46,7 +48,7 @@ class _EditPitchViewState extends State<EditPitchView> {
       dragTimeStepSize = 10;
     } else if (scalingFactor < 240) {
       dragTimeStepSize = 30;
-    } else if (scalingFactor < 480) {
+    } else {
       dragTimeStepSize = 60;
     }
     return max((seconds / dragTimeStepSize).round() * dragTimeStepSize, dragTimeStepSize);
@@ -54,12 +56,24 @@ class _EditPitchViewState extends State<EditPitchView> {
 
   @override
   Widget build(BuildContext context) {
+    scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
     return Consumer(
       builder: ((context, ref, child) {
         final pitchData = ref.watch(pitchDataProvider);
         return Scaffold(
             appBar: AppBar(
-              title: Text(widget.pitch.name),
+              title: GestureDetector(
+                  onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => EditPitchNameView(
+                            pitch: widget.pitch,
+                            onValueChanged: (pitchName) {
+                              widget.pitch.name = pitchName;
+                              pitchData.updatePitch(widget.pitch);
+                              updateScalingFactor();
+                            },
+                          )),
+                  child: Text(widget.pitch.name)),
             ),
             body: Column(
               children: [
@@ -71,9 +85,7 @@ class _EditPitchViewState extends State<EditPitchView> {
                         if (index == widget.pitch.chapters.length) {
                           return addChapterWidget(index, context, pitchData);
                         }
-                        final bgColor =
-                            Colors.primaries[index % (Colors.primaries.length)].shade100;
-                        return chapterCard(index, bgColor, pitchData, context);
+                        return chapterCard(index, pitchData, context);
                       },
                       itemCount: widget.pitch.chapters.length + 1,
                       onReorder: (oldIndex, newIndex) {
@@ -187,7 +199,8 @@ class _EditPitchViewState extends State<EditPitchView> {
     );
   }
 
-  Widget chapterCard(int index, Color bgColor, PitchDataProvider pitchData, BuildContext context) {
+  Widget chapterCard(int index, PitchDataProvider pitchData, BuildContext context) {
+    final bgColor = Colors.primaries[index % (Colors.primaries.length)].shade100;
     return Slidable(
       key: Key(index.toString()),
       endActionPane: ActionPane(

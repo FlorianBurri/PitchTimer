@@ -10,7 +10,7 @@ part 'pitch_data.g.dart';
 class PitchData {
   /// Name of the pitch
   @HiveField(0)
-  final String name;
+  String name;
 
   /// List of chapters
   @HiveField(1)
@@ -35,8 +35,7 @@ class PitchData {
   /// Returns the total duration of the pitch
   Duration get totalDuration => chapters.fold(
         Duration.zero,
-        (Duration duration, PitchChapter chapter) =>
-            duration + chapter.duration,
+        (Duration duration, PitchChapter chapter) => duration + chapter.duration,
       );
 
   Duration get shortestChapterDuration {
