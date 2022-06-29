@@ -269,29 +269,9 @@ class _EditPitchViewState extends State<EditPitchView> {
               right: 70,
               child: GestureDetector(
                 onLongPress: () {}, // disable reordering
-                onVerticalDragStart: (details) {
-                  draggedChapterInitDuration = widget.pitch.chapters[index].durationSeconds;
-                  totalDrag = 0;
-                },
-                onVerticalDragUpdate: (details) {
-                  totalDrag += details.delta.dy;
-                  var updatedChapter = PitchChapter(
-                      name: widget.pitch.chapters[index].name,
-                      notes: widget.pitch.chapters[index].notes,
-                      durationSeconds: roundSeconds(draggedChapterInitDuration +
-                          totalDrag * scalingFactor ~/ widget.shortestChapterSize));
-                  widget.pitch.chapters[index] = updatedChapter;
-                  pitchData.updatePitch(widget.pitch);
-                },
-                onVerticalDragEnd: (details) {
-                  var updatedChapter = PitchChapter(
-                      name: widget.pitch.chapters[index].name,
-                      notes: widget.pitch.chapters[index].notes,
-                      durationSeconds: roundSeconds(widget.pitch.chapters[index].durationSeconds));
-                  widget.pitch.chapters[index] = updatedChapter;
-                  pitchData.updatePitch(widget.pitch);
-                  updateScalingFactor();
-                },
+                onVerticalDragStart: (details) => chapterDragStart(details, index),
+                onVerticalDragUpdate: (details) => chapterDragUpdate(details, index, pitchData),
+                onVerticalDragEnd: (details) => chapterDragEnd(),
                 child: Container(
                   /// Extending drag gesture area
                   height: 40,
@@ -316,5 +296,25 @@ class _EditPitchViewState extends State<EditPitchView> {
         ],
       ),
     );
+  }
+
+  void chapterDragStart(details, index) {
+    draggedChapterInitDuration = widget.pitch.chapters[index].durationSeconds;
+    totalDrag = 0;
+  }
+
+  void chapterDragUpdate(details, index, PitchDataProvider pitchData) {
+    totalDrag += details.delta.dy;
+    var updatedChapter = PitchChapter(
+        name: widget.pitch.chapters[index].name,
+        notes: widget.pitch.chapters[index].notes,
+        durationSeconds: roundSeconds(
+            draggedChapterInitDuration + totalDrag * scalingFactor ~/ widget.shortestChapterSize));
+    widget.pitch.chapters[index] = updatedChapter;
+    pitchData.updatePitch(widget.pitch);
+  }
+
+  void chapterDragEnd() {
+    updateScalingFactor();
   }
 }
