@@ -73,7 +73,13 @@ class _EditPitchViewState extends State<EditPitchView> {
                               updateScalingFactor();
                             },
                           )),
-                  child: Text(widget.pitch.name)),
+                  child: Row(
+                    children: [
+                      Flexible(child: Text(widget.pitch.name)),
+                      const SizedBox(width: 20),
+                      const Icon(Icons.edit),
+                    ],
+                  )),
             ),
             body: Column(
               children: [
