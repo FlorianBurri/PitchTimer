@@ -69,36 +69,7 @@ class _EditPitchViewState extends State<EditPitchView> {
                       buildDefaultDragHandles: true,
                       itemBuilder: (context, index) {
                         if (index == widget.pitch.chapters.length) {
-                          return GestureDetector(
-                            key: Key(index.toString()),
-                            onLongPress: () {}, // disable reordering
-                            onTap: () {
-                              var newChapter = PitchChapter(
-                                  name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
-                              showDialog(
-                                  context: context,
-                                  builder: (_) => EditChapterView(
-                                        chapter: newChapter,
-                                        onValueChanged: (chapter) {
-                                          newChapter = chapter;
-                                          widget.pitch.chapters.add(newChapter);
-                                          pitchData.updatePitch(widget.pitch);
-                                          updateScalingFactor();
-                                        },
-                                      ));
-                            },
-                            child: Row(key: Key(index.toString()), children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Icon(
-                                Icons.add,
-                                size: 30,
-                              ),
-                              const SizedBox(width: 8),
-                              Text("Add new chapter", style: Theme.of(context).textTheme.bodyLarge)
-                            ]),
-                          );
+                          return addChapterWidget(index, context, pitchData);
                         }
                         final bgColor =
                             Colors.primaries[index % (Colors.primaries.length)].shade100;
@@ -180,6 +151,39 @@ class _EditPitchViewState extends State<EditPitchView> {
               ],
             ));
       }),
+    );
+  }
+
+  GestureDetector addChapterWidget(int index, BuildContext context, PitchDataProvider pitchData) {
+    return GestureDetector(
+      key: Key(index.toString()),
+      onLongPress: () {}, // disable reordering
+      onTap: () {
+        var newChapter =
+            PitchChapter(name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
+        showDialog(
+            context: context,
+            builder: (_) => EditChapterView(
+                  chapter: newChapter,
+                  onValueChanged: (chapter) {
+                    newChapter = chapter;
+                    widget.pitch.chapters.add(newChapter);
+                    pitchData.updatePitch(widget.pitch);
+                    updateScalingFactor();
+                  },
+                ));
+      },
+      child: Row(key: Key(index.toString()), children: [
+        const SizedBox(
+          height: 10,
+        ),
+        const Icon(
+          Icons.add,
+          size: 30,
+        ),
+        const SizedBox(width: 8),
+        Text("Add new chapter", style: Theme.of(context).textTheme.bodyLarge)
+      ]),
     );
   }
 
