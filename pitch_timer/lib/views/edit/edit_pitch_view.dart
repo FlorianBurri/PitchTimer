@@ -233,6 +233,7 @@ class _EditPitchViewState extends State<EditPitchView> {
                       },
                     )),
             child: Card(
+              margin: const EdgeInsets.only(bottom: 8),
               color: bgColor,
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -282,7 +283,7 @@ class _EditPitchViewState extends State<EditPitchView> {
             ),
           ),
           Positioned(
-              bottom: -6,
+              bottom: -7,
               right: 70,
               child: GestureDetector(
                 onLongPress: () {}, // disable reordering
@@ -296,17 +297,10 @@ class _EditPitchViewState extends State<EditPitchView> {
                   color: Colors.transparent,
                   child: Center(
                     child: SizedBox(
-                        height: 32,
-                        width: 40,
+                        height: 30,
+                        width: 60,
                         child: Card(
-                          elevation: 5,
-                          color: bgColor,
-                          child: Column(
-                            children: const [
-                              Icon(Icons.unfold_more),
-                            ],
-                          ),
-                        )),
+                            elevation: 0, color: bgColor, child: const Icon(Icons.drag_handle))),
                   ),
                 ),
               )),
