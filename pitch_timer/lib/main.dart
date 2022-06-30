@@ -7,6 +7,7 @@ import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
+import 'package:pitch_timer/views/splashscreen_view/splashscreen_view.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -39,7 +40,7 @@ class App extends StatelessWidget {
         FormBuilderLocalizations.delegate,
       ],
       theme: FlexThemeData.light(scheme: FlexScheme.greyLaw),
-      home: const PitchSelectionView(),
+      home: const SplashscreenView(child: PitchSelectionView()),
     );
   }
 }
