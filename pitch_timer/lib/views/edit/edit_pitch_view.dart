@@ -16,7 +16,7 @@ import 'edit_pitch_name_view.dart';
 
 class EditPitchView extends StatefulWidget {
   final PitchData pitch;
-  final double shortestChapterSize = 28;
+  final double shortestChapterSize = 29;
 
   const EditPitchView({required this.pitch, Key? key}) : super(key: key);
 
