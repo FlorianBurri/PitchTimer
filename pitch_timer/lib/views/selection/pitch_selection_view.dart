@@ -17,54 +17,72 @@ class PitchSelectionView extends ConsumerWidget {
     final pitchData = ref.watch(pitchDataProvider);
     final pitches = pitchData.pitches;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Pitch Timer',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            showDialog(context: context, builder: (_) => AddPitchView());
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          showDialog(context: context, builder: (_) => AddPitchView());
-        },
-      ),
-      body: Center(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(15),
-          itemCount: pitches.length,
-          itemBuilder: (context, index) => Card(
-            child: Slidable(
-              endActionPane: ActionPane(
-                motion: const ScrollMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) =>
-                        pitchData.deletePitch(pitches[index]),
-                    icon: Icons.delete,
-                    label: 'Delete',
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                ],
-              ),
-              child: ListTile(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => EditPitchView(pitch: pitches[index]),
-                    ),
-                  );
-                },
-                title: Text(
-                  pitches[index].name,
-                  style: Theme.of(context).textTheme.titleLarge,
+        body: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              expandedHeight: 250.0,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: const Text(
+                  'Pitch Timer',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("${pitches[index].chapters.length} chapters"),
+                background: Image.asset(
+                  "assets/images/bg.jpg",
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+            SliverList(
+              delegate: pitches.isEmpty
+                  ? SliverChildListDelegate([
+                      const Padding(
+                          padding: EdgeInsets.only(top: 300),
+                          child: Center(child: Text('Click the + button to add a new pitch'))),
+                    ])
+                  : SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Card(
+                          child: Slidable(
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (context) => pitchData.deletePitch(pitches[index]),
+                                  icon: Icons.delete,
+                                  label: 'Delete',
+                                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => EditPitchView(pitch: pitches[index]),
+                                  ),
+                                );
+                              },
+                              title: Text(
+                                pitches[index].name,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              subtitle: Text("${pitches[index].chapters.length} chapters"),
+                            ),
+                          ),
+                        ),
+                      ),
+                      childCount: pitches.length,
+                    ),
+            ),
+          ],
+        ));
   }
 }
