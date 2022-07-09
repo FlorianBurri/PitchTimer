@@ -1,11 +1,11 @@
 {
-    "name": "pitch_timer",
-    "short_name": "pitch_timer",
+    "name": "Pitch Timer",
+    "short_name": "Pitch Timer",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Time your pitches",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
