@@ -24,15 +24,46 @@ class EditPitchView extends StatefulWidget {
   State<EditPitchView> createState() => _EditPitchViewState();
 }
 
-class _EditPitchViewState extends State<EditPitchView> {
-  int scalingFactor = 10;
+class _EditPitchViewState extends State<EditPitchView> with SingleTickerProviderStateMixin {
+  late Animation<double> animation;
+  late AnimationController controller;
+  late int scalingFactor;
+  static const animationDuration = Duration(milliseconds: 600);
   double totalDrag = 0;
   int draggedChapterInitDuration = 0;
 
+  @override
+  void initState() {
+    scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
+    super.initState();
+    controller = AnimationController(duration: const Duration(), vsync: this);
+    animation = Tween<double>(begin: 0, end: scalingFactor.toDouble()).animate(controller)
+      ..addListener(() {
+        setState(() {});
+      });
+    controller.forward();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   void updateScalingFactor() {
+    double previousScalingfactor = scalingFactor.toDouble();
     setState(() {
       scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
     });
+    controller.reset();
+    controller.duration = animationDuration;
+    Animation<double> curve = CurvedAnimation(parent: controller, curve: Curves.decelerate);
+    animation =
+        Tween<double>(begin: previousScalingfactor, end: scalingFactor.toDouble()).animate(curve)
+          ..addListener(() {
+            setState(() {});
+          });
+    controller.forward();
   }
 
   String durationAsString(Duration duration) {
@@ -56,7 +87,6 @@ class _EditPitchViewState extends State<EditPitchView> {
 
   @override
   Widget build(BuildContext context) {
-    scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
     return Consumer(
       builder: ((context, ref, child) {
         final pitchData = ref.watch(pitchDataProvider);
@@ -255,7 +285,7 @@ class _EditPitchViewState extends State<EditPitchView> {
                   constraints: BoxConstraints(
                     maxHeight: max(
                             widget.pitch.chapters[index].duration.inSeconds /
-                                max(scalingFactor, 10),
+                                max(animation.value, 10),
                             1) *
                         widget.shortestChapterSize,
                   ),
