@@ -142,9 +142,11 @@ class _EditPitchViewState extends State<EditPitchView> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    HapticFeedback.heavyImpact();
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => PresentationView(pitch: widget.pitch)));
+                    if (widget.pitch.chapters.isNotEmpty) {
+                      HapticFeedback.heavyImpact();
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => PresentationView(pitch: widget.pitch)));
+                    }
                   },
                   child: Container(
                     height: 80,
@@ -156,12 +158,16 @@ class _EditPitchViewState extends State<EditPitchView> {
                           Icon(
                             Icons.play_arrow_rounded,
                             size: 45,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: widget.pitch.chapters.isNotEmpty
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context).colorScheme.outline,
                           ),
                           Text(
                             "Start",
                             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color: widget.pitch.chapters.isNotEmpty
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context).colorScheme.outline,
                                 ),
                           ),
                         ],
