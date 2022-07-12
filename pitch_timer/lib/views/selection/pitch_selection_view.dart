@@ -17,8 +17,13 @@ class PitchSelectionView extends ConsumerWidget {
     final pitchData = ref.watch(pitchDataProvider);
     final pitches = pitchData.pitches;
     return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.tertiary,
         floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          child: Icon(
+            Icons.add,
+            color: Theme.of(context).colorScheme.tertiary,
+          ),
           onPressed: () {
             showDialog(context: context, builder: (_) => AddPitchView());
           },
@@ -26,16 +31,16 @@ class PitchSelectionView extends ConsumerWidget {
         body: CustomScrollView(
           slivers: <Widget>[
             SliverAppBar(
-              expandedHeight: 250.0,
+              expandedHeight: 350.0,
               pinned: true,
+              backgroundColor: Colors.transparent,
               flexibleSpace: FlexibleSpaceBar(
-                title: const Text(
-                  'Pitch Timer',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-                background: Image.asset(
-                  "assets/images/bg.jpg",
-                  fit: BoxFit.cover,
+                background: Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Image.asset(
+                    "assets/images/title.png",
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
@@ -48,8 +53,10 @@ class PitchSelectionView extends ConsumerWidget {
                     ])
                   : SliverChildBuilderDelegate(
                       (context, index) => Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
                         child: Card(
+                          elevation: 4,
+                          color: Theme.of(context).colorScheme.secondary,
                           child: Slidable(
                             endActionPane: ActionPane(
                               motion: const ScrollMotion(),
@@ -58,7 +65,7 @@ class PitchSelectionView extends ConsumerWidget {
                                   onPressed: (context) => pitchData.deletePitch(pitches[index]),
                                   icon: Icons.delete,
                                   label: 'Delete',
-                                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
                                 ),
                               ],
                             ),
@@ -70,11 +77,26 @@ class PitchSelectionView extends ConsumerWidget {
                                   ),
                                 );
                               },
+                              leading: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                child: Image.asset(
+                                  "assets/images/pitchIcon.png",
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
                               title: Text(
                                 pitches[index].name,
-                                style: Theme.of(context).textTheme.titleLarge,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(color: Theme.of(context).colorScheme.onSecondary),
                               ),
-                              subtitle: Text("${pitches[index].chapters.length} chapters"),
+                              subtitle: Text(
+                                  "${pitches[index].chapters.length}${pitches[index].chapters.length == 1 ? " chapter" : " chapters"}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(color: Theme.of(context).colorScheme.onSecondary)),
                             ),
                           ),
                         ),

@@ -24,15 +24,46 @@ class EditPitchView extends StatefulWidget {
   State<EditPitchView> createState() => _EditPitchViewState();
 }
 
-class _EditPitchViewState extends State<EditPitchView> {
-  int scalingFactor = 10;
+class _EditPitchViewState extends State<EditPitchView> with SingleTickerProviderStateMixin {
+  late Animation<double> animation;
+  late AnimationController controller;
+  late int scalingFactor;
+  static const animationDuration = Duration(milliseconds: 600);
   double totalDrag = 0;
   int draggedChapterInitDuration = 0;
 
+  @override
+  void initState() {
+    scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
+    super.initState();
+    controller = AnimationController(duration: const Duration(), vsync: this);
+    animation = Tween<double>(begin: 0, end: scalingFactor.toDouble()).animate(controller)
+      ..addListener(() {
+        setState(() {});
+      });
+    controller.forward();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   void updateScalingFactor() {
+    double previousScalingfactor = scalingFactor.toDouble();
     setState(() {
       scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
     });
+    controller.reset();
+    controller.duration = animationDuration;
+    Animation<double> curve = CurvedAnimation(parent: controller, curve: Curves.decelerate);
+    animation =
+        Tween<double>(begin: previousScalingfactor, end: scalingFactor.toDouble()).animate(curve)
+          ..addListener(() {
+            setState(() {});
+          });
+    controller.forward();
   }
 
   String durationAsString(Duration duration) {
@@ -56,7 +87,6 @@ class _EditPitchViewState extends State<EditPitchView> {
 
   @override
   Widget build(BuildContext context) {
-    scalingFactor = max(widget.pitch.shortestChapterDuration.inSeconds, 10);
     return Consumer(
       builder: ((context, ref, child) {
         final pitchData = ref.watch(pitchDataProvider);
@@ -84,37 +114,40 @@ class _EditPitchViewState extends State<EditPitchView> {
             body: Column(
               children: [
                 Expanded(
-                  child: ReorderableListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      buildDefaultDragHandles: true,
-                      itemBuilder: (context, index) {
-                        if (index == widget.pitch.chapters.length) {
-                          return addChapterWidget(index, context, pitchData);
-                        }
-                        return chapterCard(index, pitchData, context);
-                      },
-                      itemCount: widget.pitch.chapters.length + 1,
-                      onReorder: (oldIndex, newIndex) {
-                        /// ignore moving below the add new widget
-                        if (newIndex == (widget.pitch.chapters.length + 1)) {
-                          newIndex -= 1;
-                        }
-                        if (oldIndex < newIndex) {
-                          newIndex -= 1;
-                        }
-                        final chapter = widget.pitch.chapters.removeAt(oldIndex);
-                        widget.pitch.chapters.insert(newIndex, chapter);
-                        pitchData.updatePitch(widget.pitch);
-                      }),
+                  child: Container(
+                    color: Theme.of(context).colorScheme.surface,
+                    child: ReorderableListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        buildDefaultDragHandles: true,
+                        itemBuilder: (context, index) {
+                          if (index == widget.pitch.chapters.length) {
+                            return addChapterWidget(index, context, pitchData);
+                          }
+                          return chapterCard(index, pitchData, context);
+                        },
+                        itemCount: widget.pitch.chapters.length + 1,
+                        onReorder: (oldIndex, newIndex) {
+                          /// ignore moving below the add new widget
+                          if (newIndex == (widget.pitch.chapters.length + 1)) {
+                            newIndex -= 1;
+                          }
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          final chapter = widget.pitch.chapters.removeAt(oldIndex);
+                          widget.pitch.chapters.insert(newIndex, chapter);
+                          pitchData.updatePitch(widget.pitch);
+                        }),
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.shade900,
-                        spreadRadius: 0.7,
-                        blurRadius: 7,
+                        spreadRadius: 0.2,
+                        blurRadius: 2,
                       ),
                     ],
                   ),
@@ -139,9 +172,11 @@ class _EditPitchViewState extends State<EditPitchView> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    HapticFeedback.heavyImpact();
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => PresentationView(pitch: widget.pitch)));
+                    if (widget.pitch.chapters.isNotEmpty) {
+                      HapticFeedback.heavyImpact();
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => PresentationView(pitch: widget.pitch)));
+                    }
                   },
                   child: Container(
                     height: 80,
@@ -150,15 +185,19 @@ class _EditPitchViewState extends State<EditPitchView> {
                     child: Center(
                       child: Column(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.play_arrow_rounded,
                             size: 45,
-                            color: Colors.white,
+                            color: widget.pitch.chapters.isNotEmpty
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context).colorScheme.outline,
                           ),
                           Text(
                             "Start",
                             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  color: Colors.white,
+                                  color: widget.pitch.chapters.isNotEmpty
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context).colorScheme.outline,
                                 ),
                           ),
                         ],
@@ -206,21 +245,20 @@ class _EditPitchViewState extends State<EditPitchView> {
   }
 
   Widget chapterCard(int index, PitchDataProvider pitchData, BuildContext context) {
-    final bgColor = Colors.primaries[index % (Colors.primaries.length)].shade100;
+    final bgColor = Colors.primaries[(15 - index) % (Colors.primaries.length)].shade100;
     return Slidable(
       key: Key(index.toString()),
       endActionPane: ActionPane(
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            backgroundColor: bgColor,
+            backgroundColor: Colors.transparent,
             onPressed: (context) {
               widget.pitch.chapters.removeAt(index);
               pitchData.updatePitch(widget.pitch);
             },
             icon: Icons.delete,
             label: 'Delete',
-            borderRadius: BorderRadius.circular(8),
             foregroundColor: Colors.black,
           ),
         ],
@@ -247,7 +285,7 @@ class _EditPitchViewState extends State<EditPitchView> {
                   constraints: BoxConstraints(
                     maxHeight: max(
                             widget.pitch.chapters[index].duration.inSeconds /
-                                max(scalingFactor, 10),
+                                max(animation.value, 10),
                             1) *
                         widget.shortestChapterSize,
                   ),

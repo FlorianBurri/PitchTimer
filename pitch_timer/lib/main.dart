@@ -38,7 +38,13 @@ class App extends StatelessWidget {
       localizationsDelegates: const [
         FormBuilderLocalizations.delegate,
       ],
-      theme: FlexThemeData.light(scheme: FlexScheme.greyLaw),
+      theme: FlexThemeData.light(
+        scheme: FlexScheme.bigStone,
+        primary: const Color.fromARGB(255, 26, 26, 26),
+        background: const Color(0xFFEDEEF0),
+        tertiary: Colors.amber.shade100,
+        secondary: Colors.orange.shade300,
+      ),
       home: const PitchSelectionView(),
     );
   }
