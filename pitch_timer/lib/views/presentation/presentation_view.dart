@@ -73,140 +73,156 @@ class _PresentationViewState extends State<PresentationView> {
             final nextChapter =
                 (chapterIndex) < (chapters.length - 1) ? chapters[chapterIndex + 1] : null;
             return Center(
-                child: Column(
-              children: [
-                Container(
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade900,
-                        spreadRadius: 0.2,
-                        blurRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: ListView(
-                    physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.all(10),
-                    shrinkWrap: true,
-                    children: [
-                      Text("previous", style: Theme.of(context).textTheme.labelMedium),
-                      AutoSizeText(
-                        previousChapter?.name ?? '',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        maxLines: 1,
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: Theme.of(context).colorScheme.surfaceTint.withOpacity(0.08),
-                    child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                      Expanded(
-                        child: ListView(
-                          physics: const ClampingScrollPhysics(),
-                          padding: const EdgeInsets.all(25),
-                          shrinkWrap: true,
-                          children: [
-                            const SizedBox(height: 20),
-                            Text(currentChapter.name,
-                                style: Theme.of(context).textTheme.displaySmall),
-                            const SizedBox(height: 20),
-                            Text(currentChapter.notes,
-                                style: Theme.of(context).textTheme.titleLarge),
-                            const SizedBox(
-                              height: 40,
-                            ),
-                          ],
+                child: Container(
+              color: Theme.of(context).colorScheme.background,
+              child: Column(
+                children: [
+                  Container(
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.background,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade900,
+                          spreadRadius: 0.2,
+                          blurRadius: 2,
                         ),
-                      ),
-                      Stack(
-                        children: [
-                          SizedBox(
-                            width: progressIndicatorWidth,
-                            child: RotatedBox(
-                              quarterTurns: 1,
-                              child: LinearProgressIndicator(
-                                minHeight: 20,
-                                color: Theme.of(context).colorScheme.secondary,
-                                value: (isPaused
-                                        ? pauseDuration.inMilliseconds.toDouble()
-                                        : snapshot.data!.inMilliseconds) /
-                                    currentChapter.duration.inMilliseconds,
-                              ),
-                            ),
+                      ],
+                    ),
+                    child: ListView(
+                      physics: const ClampingScrollPhysics(),
+                      padding: const EdgeInsets.all(10),
+                      shrinkWrap: true,
+                      children: [
+                        Text("previous", style: Theme.of(context).textTheme.labelMedium),
+                        AutoSizeText(
+                          previousChapter?.name ?? '',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 2),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade900,
+                            spreadRadius: 0.2,
+                            blurRadius: 2,
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            width: progressIndicatorWidth,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () => skipPrevious(snapshot.data!),
-                                  child: const RotatedBox(
-                                      quarterTurns: 1,
-                                      child: Icon(
-                                        Icons.skip_previous,
-                                        size: progressIndicatorWidth,
-                                      )),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => pause(snapshot.data!),
-                                    child: Icon(
-                                      isPaused ? Icons.play_arrow : Icons.pause,
-                                      size: progressIndicatorWidth,
-                                    ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: skipNext,
-                                  child: const RotatedBox(
-                                      quarterTurns: 1,
-                                      child: Icon(
-                                        Icons.skip_next,
-                                        size: progressIndicatorWidth,
-                                      )),
-                                )
-                              ],
-                            ),
-                          )
                         ],
                       ),
-                    ]),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                        Expanded(
+                          child: ListView(
+                            physics: const ClampingScrollPhysics(),
+                            padding: const EdgeInsets.all(25),
+                            shrinkWrap: true,
+                            children: [
+                              const SizedBox(height: 20),
+                              Text(currentChapter.name,
+                                  style: Theme.of(context).textTheme.displaySmall),
+                              const SizedBox(height: 20),
+                              Text(currentChapter.notes,
+                                  style: Theme.of(context).textTheme.titleLarge),
+                              const SizedBox(
+                                height: 40,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.shade900,
+                                    spreadRadius: 0.2,
+                                    blurRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              width: progressIndicatorWidth,
+                              child: RotatedBox(
+                                quarterTurns: 1,
+                                child: LinearProgressIndicator(
+                                  minHeight: 20,
+                                  color: Colors
+                                      .primaries[(15 - chapterIndex) % (Colors.primaries.length)]
+                                      .shade300,
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
+                                  value: (isPaused
+                                          ? pauseDuration.inMilliseconds.toDouble()
+                                          : snapshot.data!.inMilliseconds) /
+                                      currentChapter.duration.inMilliseconds,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              width: progressIndicatorWidth,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => skipPrevious(snapshot.data!),
+                                    child: const RotatedBox(
+                                        quarterTurns: 1,
+                                        child: Icon(
+                                          Icons.skip_previous,
+                                          size: progressIndicatorWidth,
+                                        )),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => pause(snapshot.data!),
+                                      child: Icon(
+                                        isPaused ? Icons.play_arrow : Icons.pause,
+                                        size: progressIndicatorWidth,
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: skipNext,
+                                    child: const RotatedBox(
+                                        quarterTurns: 1,
+                                        child: Icon(
+                                          Icons.skip_next,
+                                          size: progressIndicatorWidth,
+                                        )),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ]),
+                    ),
                   ),
-                ),
-                Container(
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade900,
-                        spreadRadius: 0.2,
-                        blurRadius: 2,
-                      ),
-                    ],
+                  Container(
+                    height: 90,
+                    color: Theme.of(context).colorScheme.background,
+                    child: ListView(
+                      physics: const ClampingScrollPhysics(),
+                      padding: const EdgeInsets.all(10),
+                      shrinkWrap: true,
+                      children: [
+                        Text("next", style: Theme.of(context).textTheme.labelMedium),
+                        AutoSizeText(
+                          nextChapter?.name ?? '',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
                   ),
-                  child: ListView(
-                    physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
-                    shrinkWrap: true,
-                    children: [
-                      Text("next", style: Theme.of(context).textTheme.labelMedium),
-                      AutoSizeText(
-                        nextChapter?.name ?? '',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        maxLines: 1,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ));
           }),
     );

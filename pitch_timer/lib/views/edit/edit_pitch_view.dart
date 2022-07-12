@@ -84,37 +84,40 @@ class _EditPitchViewState extends State<EditPitchView> {
             body: Column(
               children: [
                 Expanded(
-                  child: ReorderableListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      buildDefaultDragHandles: true,
-                      itemBuilder: (context, index) {
-                        if (index == widget.pitch.chapters.length) {
-                          return addChapterWidget(index, context, pitchData);
-                        }
-                        return chapterCard(index, pitchData, context);
-                      },
-                      itemCount: widget.pitch.chapters.length + 1,
-                      onReorder: (oldIndex, newIndex) {
-                        /// ignore moving below the add new widget
-                        if (newIndex == (widget.pitch.chapters.length + 1)) {
-                          newIndex -= 1;
-                        }
-                        if (oldIndex < newIndex) {
-                          newIndex -= 1;
-                        }
-                        final chapter = widget.pitch.chapters.removeAt(oldIndex);
-                        widget.pitch.chapters.insert(newIndex, chapter);
-                        pitchData.updatePitch(widget.pitch);
-                      }),
+                  child: Container(
+                    color: Theme.of(context).colorScheme.surface,
+                    child: ReorderableListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        buildDefaultDragHandles: true,
+                        itemBuilder: (context, index) {
+                          if (index == widget.pitch.chapters.length) {
+                            return addChapterWidget(index, context, pitchData);
+                          }
+                          return chapterCard(index, pitchData, context);
+                        },
+                        itemCount: widget.pitch.chapters.length + 1,
+                        onReorder: (oldIndex, newIndex) {
+                          /// ignore moving below the add new widget
+                          if (newIndex == (widget.pitch.chapters.length + 1)) {
+                            newIndex -= 1;
+                          }
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          final chapter = widget.pitch.chapters.removeAt(oldIndex);
+                          widget.pitch.chapters.insert(newIndex, chapter);
+                          pitchData.updatePitch(widget.pitch);
+                        }),
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.shade900,
-                        spreadRadius: 0.7,
-                        blurRadius: 7,
+                        spreadRadius: 0.2,
+                        blurRadius: 2,
                       ),
                     ],
                   ),
@@ -150,15 +153,15 @@ class _EditPitchViewState extends State<EditPitchView> {
                     child: Center(
                       child: Column(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.play_arrow_rounded,
                             size: 45,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           Text(
                             "Start",
                             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                           ),
                         ],
@@ -206,21 +209,20 @@ class _EditPitchViewState extends State<EditPitchView> {
   }
 
   Widget chapterCard(int index, PitchDataProvider pitchData, BuildContext context) {
-    final bgColor = Colors.primaries[index % (Colors.primaries.length)].shade100;
+    final bgColor = Colors.primaries[(15 - index) % (Colors.primaries.length)].shade100;
     return Slidable(
       key: Key(index.toString()),
       endActionPane: ActionPane(
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-            backgroundColor: bgColor,
+            backgroundColor: Colors.transparent,
             onPressed: (context) {
               widget.pitch.chapters.removeAt(index);
               pitchData.updatePitch(widget.pitch);
             },
             icon: Icons.delete,
             label: 'Delete',
-            borderRadius: BorderRadius.circular(8),
             foregroundColor: Colors.black,
           ),
         ],
