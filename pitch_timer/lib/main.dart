@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
+import 'package:pitch_timer/views/introduction/introduction_screen.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
 void main() async {

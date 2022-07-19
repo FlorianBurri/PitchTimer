@@ -217,7 +217,7 @@ class _EditPitchViewState extends State<EditPitchView> with SingleTickerProvider
       onLongPress: () {}, // disable reordering
       onTap: () {
         var newChapter =
-            PitchChapter(name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
+            PitchChapter(name: "", durationSeconds: const Duration(minutes: 1).inSeconds);
         showDialog(
             context: context,
             builder: (_) => EditChapterView(
