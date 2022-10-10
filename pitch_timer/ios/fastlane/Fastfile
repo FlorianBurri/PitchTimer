@@ -15,7 +15,6 @@ platform :ios do
     upload_to_testflight(
       reject_build_waiting_for_review: true,
     )
-    upload_symbols_to_crashlytics(dsym_path: "./Runner.app.dSYM.zip")
     notification(subtitle: "Success", message: "App pushed to TestFlight")
   end
 end

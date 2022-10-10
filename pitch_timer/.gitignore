@@ -44,3 +44,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# iOS
+**/Runner.app.dSYM.zip
+**/Runner.ipa
