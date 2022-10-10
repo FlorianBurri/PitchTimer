@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:pitch_timer/global_providers.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';

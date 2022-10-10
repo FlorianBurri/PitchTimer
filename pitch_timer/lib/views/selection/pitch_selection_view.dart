@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:pitch_timer/services/pitch_data_provider.dart';
+import 'package:pitch_timer/global_providers.dart';
 import 'package:pitch_timer/views/edit/edit_pitch_view.dart';
 import 'package:pitch_timer/views/selection/add_pitch_view.dart';
 
 import '../introduction/introduction_screen.dart';
-
-final pitchDataProvider = ChangeNotifierProvider<PitchDataProvider>((ref) {
-  return PitchDataProvider();
-});
 
 class PitchSelectionView extends ConsumerWidget {
   const PitchSelectionView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.read(settingsProvider);
+    if (!settings.hasBeenOpened()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAppIntroductionScreen(context);
+        settings.markOpened();
+      });
+    }
+
     final pitchData = ref.watch(pitchDataProvider);
     final pitches = pitchData.pitches;
     return Scaffold(
@@ -110,43 +114,21 @@ class PitchSelectionView extends ConsumerWidget {
             ),
             Positioned(
               right: 0,
-              top: 25,
-              child: GestureDetector(
-                onTap: () => showAppIntroductionScreen(context),
-                child: SizedBox(
-                  width: 60,
-                  height: 30,
-                  child: Container(
-                    //color: Theme.of(context).colorScheme.tertiary,
-                    /*decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          spreadRadius: 2,
-                          blurRadius: 2,
-                        ),
-                      ],
-                    ),*/
-                    /*
-                    child: Center(
-                      child: Icon(
-                        Icons.help_outline,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(1),
-                      ),*/
-
-                    child: Center(
-                      child: Text(
-                        "HELP",
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSecondary,
-                            backgroundColor: Theme.of(context).colorScheme.tertiary),
-                      ),
+              top: 40,
+              child: SizedBox(
+                width: 60,
+                height: 30,
+                child: Center(
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.info_outline,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(1),
                     ),
+                    onPressed: () => showAppIntroductionScreen(context),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ));
   }

@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
-import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
 class AppIntroductionScreen extends StatelessWidget {
   PageViewModel getAnimatedPage(String title, String imagePath) {
@@ -23,7 +21,7 @@ class AppIntroductionScreen extends StatelessWidget {
     PageViewModel(
       title: "Welcome to the Pitch Timer App!",
       body:
-          """When the time is limitted, it is key to use every second wisely. This app will help you plan and manage your time.""",
+          """When the time is limited, it is key to use every second wisely. This app will help you plan and manage your time.""",
       image: Center(
         child: Image.asset(
           "assets/images/title.png",
@@ -34,8 +32,6 @@ class AppIntroductionScreen extends StatelessWidget {
   ];
 
   AppIntroductionScreen({Key? key}) : super(key: key) {
-    _listPagesViewModel
-        .add(getAnimatedPage("Add new chapter", "assets/animations/AddNewChapter_50.gif"));
     _listPagesViewModel.add(
         getAnimatedPage("Tap a chapter to edit", "assets/animations/EditChapter_50_short.gif"));
     _listPagesViewModel.add(
