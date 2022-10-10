@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:pitch_timer/global_providers.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
@@ -217,7 +218,7 @@ class _EditPitchViewState extends State<EditPitchView> with SingleTickerProvider
       onLongPress: () {}, // disable reordering
       onTap: () {
         var newChapter =
-            PitchChapter(name: "", durationSeconds: const Duration(seconds: 30).inSeconds);
+            PitchChapter(name: "", durationSeconds: const Duration(minutes: 1).inSeconds);
         showDialog(
             context: context,
             builder: (_) => EditChapterView(

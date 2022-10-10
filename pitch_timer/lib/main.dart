@@ -6,19 +6,25 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pitch_timer/models/pitch_chapter.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
+import 'package:pitch_timer/services/settings_provider.dart';
 import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
+
+import 'global_providers.dart';
 
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(PitchDataAdapter());
   Hive.registerAdapter(PitchChapterAdapter());
 
-  final pitchProvider = PitchDataProvider();
-  await pitchProvider.init();
+  final pitchDataProvider_ = PitchDataProvider();
+  await pitchDataProvider_.init();
+  final settingsProvider_ = SettingsProvider();
+  await settingsProvider_.init();
 
   runApp(ProviderScope(
     overrides: [
-      pitchDataProvider.overrideWithValue(pitchProvider),
+      pitchDataProvider.overrideWithValue(pitchDataProvider_),
+      settingsProvider.overrideWithValue(settingsProvider_),
     ],
     child: const App(),
   ));
