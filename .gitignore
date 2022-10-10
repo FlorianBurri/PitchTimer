@@ -29,6 +29,7 @@ lib/generated_plugin_registrant.dart
 **/android/key.properties
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+**/report.xml
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -67,3 +68,6 @@ lib/generated_plugin_registrant.dart
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
 # End of https://www.toptal.com/developers/gitignore/api/flutter
+
+# Firebase
+pitch_timer/.firebase/*

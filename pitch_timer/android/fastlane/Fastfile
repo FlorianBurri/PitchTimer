@@ -1,0 +1,19 @@
+platform :android do
+  desc "Submit a new Beta Build to Google Play"
+  lane :beta do
+    sh("flutter", "clean")
+    sh("flutter", "pub", "get")
+    sh("flutter", "build", "appbundle", "--release")
+    upload_to_play_store(
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      track: 'alpha',
+      release_status: 'completed',
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: true,
+      skip_upload_changelogs: true
+    )
+    notification(subtitle: "Success", message: "App pushed to Google Play")
+  end
+end

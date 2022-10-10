@@ -1,0 +1,2 @@
+json_key_file("/Users/eliabieri/Dropbox/Projects/wgzimmer_ch_app/google_play_access_key/pc-api-4636638935683980046-444-060ff92962a9.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("dev.eliabieri.pitch_timer")
