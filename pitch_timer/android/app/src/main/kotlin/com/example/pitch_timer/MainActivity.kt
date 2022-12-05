@@ -1,4 +1,4 @@
-package com.example.pitch_timer
+package dev.eliabieri.pitch_timer
 
 import io.flutter.embedding.android.FlutterActivity
 
