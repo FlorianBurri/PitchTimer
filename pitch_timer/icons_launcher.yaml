@@ -1,6 +1,12 @@
 # Run flutter pub run icons_launcher:create to update
-flutter_icons:
-  android: true
-  ios: true
-  web: true
+icons_launcher:
   image_path: "assets/icon/icon.png"
+  platforms:
+    android:
+      adaptive_foreground_image: "assets/icon/icon_android.png"
+      adaptive_background_color: "#ffebb1"
+      enable: true
+    ios:
+      enable: true
+    web:
+      enable: true
