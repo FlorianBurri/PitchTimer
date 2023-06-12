@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pitch_timer/global_providers.dart';
 import 'package:pitch_timer/models/pitch_data.dart';
-import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
 class AddPitchView extends ConsumerWidget {
   final _controller = TextEditingController();

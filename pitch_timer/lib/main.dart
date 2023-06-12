@@ -23,8 +23,8 @@ void main() async {
 
   runApp(ProviderScope(
     overrides: [
-      pitchDataProvider.overrideWithValue(pitchDataProvider_),
-      settingsProvider.overrideWithValue(settingsProvider_),
+      pitchDataProvider.overrideWith((_) => pitchDataProvider_),
+      settingsProvider.overrideWith((_) => settingsProvider_),
     ],
     child: const App(),
   ));

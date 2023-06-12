@@ -11,7 +11,6 @@ import 'package:pitch_timer/models/pitch_data.dart';
 import 'package:pitch_timer/services/pitch_data_provider.dart';
 import 'package:pitch_timer/views/edit/edit_chapter_view.dart';
 import 'package:pitch_timer/views/presentation/presentation_view.dart';
-import 'package:pitch_timer/views/selection/pitch_selection_view.dart';
 
 import 'edit_pitch_name_view.dart';
 

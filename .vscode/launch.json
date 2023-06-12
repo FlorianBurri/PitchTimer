@@ -8,6 +8,7 @@
             "name": "pitch_timer",
             "cwd": "pitch_timer",
             "request": "launch",
+            "deviceId": "iPad",
             "type": "dart"
         },
         {

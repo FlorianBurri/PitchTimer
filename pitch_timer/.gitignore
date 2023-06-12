@@ -48,3 +48,6 @@ app.*.map.json
 # iOS
 **/Runner.app.dSYM.zip
 **/Runner.ipa
+
+# General
+.DS_Store
